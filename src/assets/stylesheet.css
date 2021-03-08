@@ -3,31 +3,14 @@
     --input-padding-y: .75rem;
 }
 
-body {
-    background: #007bff;
-    background: linear-gradient(to right, #0062E6, #33AEFF);
-}
-
 #parallax {
     position: relative;
     width: 100%;
-    height: 100vh;
+    height: 35vh;
     background-image: url(https://raw.githubusercontent.com/oscicen/oscicen.github.io/master/img/depth-3.png), url(https://raw.githubusercontent.com/oscicen/oscicen.github.io/master/img/depth-2.png), url(https://raw.githubusercontent.com/oscicen/oscicen.github.io/master/img/depth-1.png);
     background-repeat: no-repeat;
     background-position: center;
     background-position: 50% 50%;
-}
-
-h1 {
-    position: absolute;
-    top: 47%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #fff;
-    font-family: "Arial";
-    text-transform: uppercase;
-    opacity: .2;
-    font-size: 70px;
 }
 
 .card-signin {
@@ -157,3 +140,6 @@ h1 {
         color: #777;
     }
 }
+
+
+/* ----------- TEST -------------- */
