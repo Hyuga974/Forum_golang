@@ -13,6 +13,23 @@
     background-position: 50% 50%;
 }
 
+#validationTextarea::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: #F5F5F5;
+}
+
+#validationTextarea::-webkit-scrollbar {
+    width: 12px;
+    background-color: #F5F5F5;
+}
+
+#validationTextarea::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: gray;
+}
+
 .card-signin {
     border: 0;
     border-radius: 1rem;
@@ -33,7 +50,7 @@
     width: 100%;
 }
 
-.form-signin .btn {
+s .form-signin .btn {
     font-size: 80%;
     border-radius: 5rem;
     letter-spacing: .1rem;
@@ -114,6 +131,24 @@
     background-color: #3b5998;
 }
 
+.btn-label {
+    position: relative;
+    left: -12px;
+    display: inline-block;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px 0 0 3px;
+}
+
+.btn-labeled {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.btn {
+    margin-bottom: 10px;
+}
+
 
 /* Fallback for Edge
   -------------------------------------------------- */
@@ -143,3 +178,47 @@
 
 
 /* ----------- TEST -------------- */
+
+.drop-zone {
+    max-width: 200px;
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: gray;
+    font-size: 300;
+    cursor: pointer;
+}
+
+.drop-zone--over {
+    border: 4px solid green;
+    border-radius: 10px;
+}
+
+.drop-zone__input {
+    display: none;
+}
+
+.drop-zone__thumb {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #cccccc;
+    background-size: cover;
+    position: relative;
+}
+
+.drop-zone__thumb::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 5px 0;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.75);
+    text-align: center;
+}

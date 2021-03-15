@@ -6,12 +6,20 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	uuid "github.com/satori/go.uuid"
 )
 
+//POSTINFO: Informations pour un Post
+type POSTINFO struct {
+	User_Info  INFO
+	Categories []string
+}
+
+//INFO: Déstiné à fournir des informations du user
 type INFO struct {
 	ID          int
 	Email       string
@@ -25,6 +33,7 @@ type INFO struct {
 	Msg         string
 }
 
+//COOKIE: cookie
 type Cookie struct {
 	Name    string
 	Value   string
@@ -38,7 +47,8 @@ func main() {
 
 	http.HandleFunc("/posts", AllPosts)
 	http.HandleFunc("/post", OnePost)
-	//http.HandleFunc("/profil", Profil)
+	//http.HandleFunc("/newpost", CreationPost)
+	http.HandleFunc("/profil", Profil)
 	http.HandleFunc("/login", Login)
 	http.HandleFunc("/register", Register)
 	http.HandleFunc("/test", Test)
@@ -85,6 +95,69 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func CreationPost(w http.ResponseWriter, r *http.Request) {
+	user := getSession(r)
+
+	var data POSTINFO
+
+	//sport, anime/manga, economie, jeux vidéo, informatique, voyages, NEW, paranormal.
+	allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
+	tabCategories := strings.Split(allCategories, ";")
+
+	db, err := sql.Open("sqlite3", "database/database.db")
+	checkErr(err)
+
+	if r.Method == "POST" {
+		datab, err := db.Prepare("INSERT INTO Posts (title, categories, body, user_id, image) VALUES (?,?,?,?,?)")
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, "Server Error", 500)
+		}
+		title := r.FormValue("title")
+		body := r.FormValue("body")
+		image := r.FormValue("image")
+
+		var categoriesCheck string
+		for _, categorie := range tabCategories {
+			if r.FormValue(categorie) != "" {
+				categoriesCheck += categorie + ";"
+			}
+		}
+
+		if title != "" && body != "" && categoriesCheck != "" {
+			user_id := user.ID
+			_, err := datab.Exec(title, categoriesCheck, body, user_id, image)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+		}
+		tabCategoriesCheck := strings.Split(categoriesCheck, ";")
+		data = POSTINFO{
+			User_Info:  user,
+			Categories: tabCategoriesCheck,
+		}
+	} else {
+		data = POSTINFO{
+			User_Info:  user,
+			Categories: tabCategories,
+		}
+	}
+
+	files := []string{"template/NewPost.html", "template/Common.html"}
+
+	tmp, err := template.ParseFiles(files...)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Server Error: Check template", 500)
+	}
+
+	err = tmp.Execute(w, data)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Server Error", 500)
+	}
+}
+
 //OnePost : Page pour un seul post
 func OnePost(w http.ResponseWriter, r *http.Request) {
 	user := getSession(r)
@@ -109,6 +182,24 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 	user := getSession(r)
 
 	files := []string{"template/Posts.html", "template/Common.html"}
+
+	tmp, err := template.ParseFiles(files...)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Server Error: Check template", 500)
+	}
+
+	err = tmp.Execute(w, user)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Server Error", 500)
+	}
+}
+
+func Profil(w http.ResponseWriter, r *http.Request) {
+	user := getSession(r)
+
+	files := []string{"template/Profil.html", "template/Common.html"}
 
 	tmp, err := template.ParseFiles(files...)
 	if err != nil {
