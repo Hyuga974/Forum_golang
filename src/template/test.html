@@ -4,22 +4,24 @@
     <div class="border border-secondary container rounded-3 pl-2 pr-2 pb-2 mt-5">
         <div class="container">
             <div class="row">
-                <h6 class="d-flex justify-content-center text-danger">{{ .Msg }}</h6>
+                <h6 class="d-flex justify-content-center text-danger">Ta mère</h6>
                 <form class="row needs-validation" method="POST" novalidate>
                     <div class="dropdown" style="float: right;">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float: right;">
                             Catégories
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <div><input type="checkbox" id="test" name="test" value="value1" style="text-align: left; margin-left: 5%;"> Test</div>
+                            {{ range $categorie:= .Post_Info.Categories}}
+                            <div><input type="checkbox" id="test" name="{{ $categorie.Categorie }}" value="{{ $categorie.Categorie }}" style="text-align: left; margin-left: 5%;"> {{ $categorie.Categorie }}</div>
+                            {{ end }}
                         </div>
                     </div>
-                    <input type="text" style="float: left;" class="form-control w-25" name="mail" placeholder="Titre du post..." id="validationCustom01" required>
+                    <input type="text" style="float: left;" class="form-control w-25" name="title" placeholder="Titre du post..." id="validationCustom01" required>
                     <div class="invalid-feedback" style="float: left;">
                         Veuillez mettre un titre.
                     </div>
                     <label for="validationTextarea" class="form-label mt-2" style="float: left;">Ajouter du contenu :</label>
-                    <textarea class="form-control w-75" id="validationTextarea" placeholder="Contenu du post..." style="resize: none; float: left;" cols="2" rows="13" required></textarea>
+                    <textarea class="form-control w-75" id="validationTextarea" name="body" placeholder="Contenu du post..." style="resize: none; float: left;" cols="2" rows="13" required></textarea>
                     <div class="invalid-feedback" style="float: left;">
                         Veuillez entrer le contenu de votre post.
                     </div>
@@ -29,7 +31,8 @@
                         <input type="file" name="myFile" class="drop-zone__input">
                     </div>
                     <div class="col-12 mt-3">
-                        <button class="btn btn-outline-primary" type="submit">Se Connecter</button>
+                        <a class="btn btn-outline-danger" href="/" style="float: left;">Annuler</a>
+                        <button class="btn btn-outline-success" type="submit" style="float: right;">Pubiler le post</button>
                     </div>
                 </form>
             </div>

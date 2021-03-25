@@ -2,40 +2,47 @@
 <div class="border border-secondary container rounded-3 pl-2 pr-2 pb-2 mt-5">
     <!-- CATEGORIE -->
 
-    <p style="float:right">uu</p>
-    <img src="https://cdn.discordapp.com/attachments/809777107039289344/816958638195343390/unknown.png" style="float:right;border-radius: 100%;height:25px;width:25px;">
-    <p style="float:right"> ❤️ 6k | </p>
-    <h1>Titre du Post
-        <h5>
-            <span class="badge rounded-pill bg-primary">Primary</span>
-            <span class="badge rounded-pill bg-secondary">Secondary</span>
-            <span class="badge rounded-pill bg-success">Success</span>
-            <span class="badge rounded-pill bg-danger">Danger</span>
-        </h5>
+    <p style="float:right">{{ .Post_User_Info.UserName }}</p>
+    <img src="{{ .Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:25px;width:25px;">
+    <p style="float:right"> ❤️ {{ .Post_Info.Likes}} | </p>
+    <h1>{{ .Post_Info.Title }}
+        <h6>
+            {{ range $cat:=.Post_Info.Categories}}
+            <span class="badge rounded-pill bg-primary">{{ $cat.Cat }}</span> {{ end }}
+        </h6>
     </h1>
     <div class="row">
-        <div class="col-6 align-self-center">
-            <p class="" style="width: auto;height:auto;">Text du post</p>
+        {{ if .Post_Info.Image }}
+        <div class="col-6 mt-3">
+            <span>{{ .Post_Info.Body }}</span>
         </div>
         <div class="col-6">
-            <img src="https://media.discordapp.net/attachments/809777107039289344/809800105007644702/unknown.png" style="max-width: 100%;height: auto;">
+            <img src="{{ .Post_Info.Image }}" style="max-width: 100%;height: auto;">
         </div>
+        {{ else }}
+        <div class="col-9 mt-3">
+            <span>{{ .Post_Info.Body }}</span>
+        </div>{{ end }}
     </div>
 </div>
 <br>
-<div class="container">
-    <input type="text" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;"> <button class="btn btn-outline-secondary"><i class="fas fa-paper-plane"></i> Commenter</button></input>
-</div>
+<form method="POST">
+    <div class="container">
+        <input type="text" name="comment" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;"> <button class="btn btn-outline-secondary"><i class="fas fa-paper-plane"></i> Commenter</button></input>
+    </div>
+</form>
 <br>
 <div class="container">
+    {{ range $comment:= .Post_Info.All_Comments }}
     <div class="row">
         <div class="border rounded-3 col mt-1">
             <div class="text mt-3">
-                <h6 class="float-start">Woaw je suis tellement d'accord !</h6>
-                <p class="float-end"> Elodie </p>
-                <img src="https://cdn.discordapp.com/attachments/809777107039289344/816958638195343390/unknown.png" style="float:right;border-radius: 100%;height:25px;width:25px;">
+                <h6 class="float-start">{{ $comment.Body }}</h6>
+                <p class="float-end"> {{ $comment.User_Info.UserName}} </p>
+                <img src="{{ $comment.User_Info.Image}}" style="float:right;border-radius: 100%;height:25px;width:25px;">
             </div>
         </div>
     </div>
+    {{ end }}
 </div>
 {{ end }}
