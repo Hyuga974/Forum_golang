@@ -1,15 +1,59 @@
-{{ template "main" . }} {{ define "body" }}
-<div class="row py-5 px-4">
-    <div class="col-md-5 mx-auto">
+{{ template "main" . }} {{ define "body" }} 
+  <!-- Modal -->
+  <script>
+    var myModal = document.getElementById('myModal')
+  var myInput = document.getElementById('myInput')
+  
+  myModal.addEventListener('shown.bs.modal', function () {
+    myInput.focus()
+  })
+   </script>
+  
+    <div class="media-body mb-5 text-white">
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          </div>
+          <div class="modal-body">
+            <div class="form-group has-success">
+              <label class="form-control-label" for="inputValid">Username</label>
+              <input type="text" value="correct value" class="form-control is-valid" id="inputValid">
+              <div class="valid-feedback">This name isn't taken yet</div>
+            </div>
+            
+            <div class="form-group has-danger">
+              <label class="form-control-label" for="inputInvalid">Pays</label>
+              <input type="text" value="wrong value" class="form-control is-invalid" id="inputInvalid">
+              <div class="invalid-feedback">Is this country existing ?</div>
+            </div>
+            
+            <div class="form-group">
+              <label class="col-form-label" for="inputDefault">Default input</label>
+              <input type="text" class="form-control" placeholder="Default input" id="inputDefault">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<div class="row py-10 px-7">
+    <div class="col-sm-2 mx-auto border">
         <!-- Profile widget -->
-        <div class="bg-white shadow rounded overflow-hidden">
+        <!-- <div class="bg-white shadow rounded overflow-hidden" style="float: left;">
             <div class="px-4 pt-0 pb-4 cover">
                 <div class="media align-items-end profile-head">
-                    <div class="profile mr-3"><img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80" alt="..." width="130" class="rounded mb-2 img-thumbnail"><a href="#" class="btn btn-outline-dark btn-sm btn-block">Edit profile</a></div>
+                    <div class="profile mr-3"><img src="" alt="..." width="130" class="rounded mb-2 img-thumbnail">
+                        <a href="#" class="btn btn-outline-white btn-sm btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit Profile</a></div>
                     <div class="media-body mb-5 text-white">
-                        <h4 class="mt-0 mb-0">Willem Dafoe</h4>
-                        <p class="small mb-4"> <i class="fas fa-map-marker-alt mr-2"></i>France</p>
-                    </div>
+                        <h4 class="mt-0 mb-0">{{ .User_Info.UserName }}</h4>
+                        <p class="small mb-4"> <i class="fas fa-map-marker-alt mr-2"></i>{{ .User_Info.Country }}</p>
+                    </div>d
                 </div>
             </div>
             <div class="bg-light p-4 d-flex justify-content-end text-center">
@@ -17,31 +61,117 @@
                     <li class="list-inline-item">
                         <h5 class="font-weight-bold mb-0 d-block">0</h5><small class="text-muted"> <i class="fas fa-image mr-1"></i>Posts</small>
                     </li>
-                    <li class="list-inline-item">
-                        <h5 class="font-weight-bold mb-0 d-block">0</h5><small class="text-muted"> <i class="fas fa-user mr-1"></i>Followers</small>
-                    </li>
-                    <li class="list-inline-item">
-                        <h5 class="font-weight-bold mb-0 d-block">0</h5><small class="text-muted"> <i class="fas fa-user mr-1"></i>Following</small>
-                    </li>
+  
                 </ul>
             </div>
             <div class="px-4 py-3">
-                <label for="validationTextarea" class="form-label mt-2" style="float: left;">Ajouter une biographie :</label>
-                <textarea class="form-control w-75" id="validationTextarea" name="body" placeholder="Contenu du post..." style="resize: none; float: left;" cols="2" rows="13" required></textarea>
-                <div class="invalid-feedback" style="float: left;">
-                    Veuillez entrer le contenu de votre post.
+                <h5 class="mb-0">About</h5>
+                <div class="p-4 rounded shadow-sm bg-light">
+                    <p class="font-italic mb-0">Golang Developer</p>
+                    <p class="font-italic mb-0">Lives in Bordeaux</p>
+                    <p class="font-italic mb-0">Costa a plein temps</p>
                 </div>
             </div>
+        </div> -->
+        <div class="card" style="width: 18rem; float: left;">
+            <img src="{{ .User_Info.Image }}" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">{{ .User_Info.UserName }}</h5>
+              <p class="card-text">{{ .User_Info.Description }}</p>
+              <a href="#" class="btn btn-outline-white btn-sm btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit Profile</a>
+            </div>
         </div>
-        <div class="py-4 px-4">
+      </div>
+      <div class="col-sm-5 mx-auto border">
+        <!-- <div class="py-4 px-4" style="float: right;">
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <h5 class="mb-0">Recent Post</h5><a href="#" class="btn btn-link text-muted">Show all</a>
+                {{ range $post := .User_Info.AllPosts}}
+                  <li class="list-inline-item">
+                        {{ $post.Title }}
+
+                        <div class="row">
+                        {{ if $post.Image }}
+                        <div class="col-6 mt-3 text-truncate" style="max-width: 150px;">
+                            <span>{{ $post.Body }}</span>
+                        </div>
+                        <div class="col-6">
+                            <img src="{{ $post.Image }}" style="max-width: 100%;height: auto;">
+                        </div>
+                        {{ else }}
+                        <div class="col-9 mt-3 text-truncate" style="max-width: 150px;">
+                            <span>{{ $post.Body }}</span>
+                        </div>{{ end }}
+                      </div>
+                    </li>
+                {{ end }}
             </div>
-            <div class="row">
+        </div> -->
+        <div class="row row-cols-1 g-4">
+          <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+              </div>
             </div>
+          </div>
+          <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+              </div>
+            </div>
+          </div>
         </div>
     </div>
+    <div class="col-sm-4 border">
+      <h4>Dernier Post</h4>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Card title</h5>
+          <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+        </div>
+      </div>
+      <br>
+      <h4>Dernier Like</h4>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Card title</h5>
+          <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          <button type="button" class="btn btn-danger">
+            <i class="far fa-heart"></i>
+            Like
+          </button>
+        </div>
+        
+      </div>
+      <h4>Dernier Commentaire</h4>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Card title</h5>
+          <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+        </div>
+      </div>
+    </div>
 </div>
-</div>
+
 
 {{ end }}

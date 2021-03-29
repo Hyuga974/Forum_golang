@@ -26,9 +26,63 @@
     </div>
 </div>
 <br>
-<form method="POST">
+<form method="POST" class="needs-validation" novalidate>
+    <!-- <input name="Liker"  type="checkbox" class="btn btn-danger" {{.Currently_Post_Like}} onchange="submit()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+        <path d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"></path>
+        </svg>
+        Like
+    </input> -->
+    <div id="main-content">
+        <div>
+          <input name="Liker" type="checkbox" id="checkbox" {{ .Currently_Post_Like }} onchange="submit()" />
+          <label for="checkbox">
+            <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
+              <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
+                <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
+                <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
+      
+                <g id="grp7" opacity="0" transform="translate(7 6)">
+                  <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
+                  <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
+                </g>
+      
+                <g id="grp6" opacity="0" transform="translate(0 28)">
+                  <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
+                  <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
+                </g>
+      
+                <g id="grp3" opacity="0" transform="translate(52 28)">
+                  <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
+                  <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
+                </g>
+      
+                <g id="grp2" opacity="0" transform="translate(44 6)">
+                  <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
+                  <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
+                </g>
+      
+                <g id="grp5" opacity="0" transform="translate(14 50)">
+                  <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
+                  <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
+                </g>
+      
+                <g id="grp4" opacity="0" transform="translate(35 50)">
+                  <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
+                  <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
+                </g>
+      
+                <g id="grp1" opacity="0" transform="translate(24)">
+                  <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
+                  <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
+                </g>
+              </g>
+            </svg>
+          </label>
+        </div>  
+    </div> 
     <div class="container">
-        <input type="text" name="comment" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;"> <button class="btn btn-outline-secondary"><i class="fas fa-paper-plane"></i> Commenter</button></input>
+        <input type="text" name="comment" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;" required> <button class="btn btn-outline-secondary"><i class="fas fa-paper-plane"></i> Commenter</button></input>
     </div>
 </form>
 <br>
@@ -45,4 +99,25 @@
     </div>
     {{ end }}
 </div>
+<script>
+    {{/* (function() {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation:not(.passwd)')
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })() */}}
+</script>
 {{ end }}

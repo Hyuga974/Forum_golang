@@ -1,17 +1,128 @@
 {{ template "main" . }} {{ define "body" }}
-<div class="card" style="width: 18rem;">
-    <!--image de l'utilisateur a insérer en haut du post ?-->
-    <div class="card-body">
-        <h5 class="card-title">Titre du Post</h5>
-        <p class="card-text">Contenu du post.</p>
-        <a href="#" class="btn btn-success btn-sm">Like</a>
-        <figcaption class="blockquote-footer">
-            Powered by <cite title="Source Title">Golang</cite>
-        </figcaption>
-        </figure>
+<br>
+<br>
+<div class="container">
+    <div>
+    {{ range $categories := .Posts_Info.AllCategories }}
+        <h4 class="d-flex justify-content-between">
+        <span class="badge rounded-pill bg-primary text-dark">$categories</span>
+        <span class="badge rounded-pill bg-secondary">Secondary</span>
+        <span class="badge rounded-pill bg-success">Success</span>
+        <span class="badge rounded-pill bg-danger">Danger</span>
+        <span class="badge rounded-pill bg-warning text-dark">Warning</span>
+        <span class="badge rounded-pill bg-info text-dark">Info</span>
+        <span class="badge rounded-pill bg-light text-dark">Light</span>
+        <span class="badge rounded-pill bg-dark">Dark</span>
+        </h4>
+        {{ end }}
     </div>
 </div>
-{{end}}
+<br>
+<div class="container" style="padding-bottom: 0px; margin-bottom: 0px; border-bottom: 0px;">
+   <p>Filtres</p> 
+</div>
+<div class="container" style="border-top: 2px solid black">
+    <br>
+    <div class="row">
+    <div class="col-sm-3">
+        <div class="btn-group">
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+            Left-aligned, right-aligned lg
+            </button>
+            <ul class="dropdown-menu dropdown-menu-lg-end">
+            <li><a class="dropdown-item" href="#">Menu item</a></li>
+            <li><a class="dropdown-item" href="#">Menu item</a></li>
+            <li><a class="dropdown-item" href="#">Menu item</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-sm-6"></div>
+    <div class="col-sm-3">
+        <form class="d-flex" style="height: 100%;">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" style="height: 81%;">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+    </div>
+    </div>
+</div>
+<div class="container mt-5">
+    <div class="row g-2">
+        <div class="col">
+            <div class="bg-light">
+                <div class="card">
+                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">content post</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="bg-light">
+                <div class="card">
+                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">content post</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="bg-light">
+                <div class="card">
+                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">content post</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-2 mt-2">
+        <div class="col">
+            <div class="bg-light">
+                <div class="card">
+                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">content post</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="bg-light">
+                <div class="card">
+                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">content post</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="bg-light">
+                <div class="card">
+                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">content post</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!--<div class="input-group">
   <input type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
@@ -19,3 +130,4 @@
 </div>
 
 C'est pour importer un fichier (photo de profil ou post avec photo)-->
+{{end}}

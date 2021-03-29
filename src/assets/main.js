@@ -69,3 +69,4 @@ function updateThumbnail(dropZoneElement, file) {
         thumbnailElement.style.backgroundImage = null;
     }
 }
+
