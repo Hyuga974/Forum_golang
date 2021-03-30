@@ -5,9 +5,9 @@
 
 #parallax {
     position: relative;
-    width: 100%;
+    background-size: auto, auto, cover;
     height: 35vh;
-    background-image: url(https://raw.githubusercontent.com/oscicen/oscicen.github.io/master/img/depth-3.png), url(https://raw.githubusercontent.com/oscicen/oscicen.github.io/master/img/depth-2.png), url(https://raw.githubusercontent.com/oscicen/oscicen.github.io/master/img/depth-1.png);
+    background-image: url(../assets/images/part3.png), url(../assets/images/part2.png), url(../assets/images/part1.png);
     background-repeat: no-repeat;
     background-position: center;
     background-position: 50% 50%;
@@ -268,7 +268,7 @@ s .form-signin .btn {
   svg {
     cursor: pointer;
     overflow: visible;
-    width: 60px;
+    width: 30px;
   }
   svg #heart {
     transform-origin: center;
@@ -311,12 +311,12 @@ s .form-signin .btn {
     transition: 0.1s all 0.3s;
   }
   #checkbox:checked + label svg #grp2 #oval1 {
-    transform: scale(0) translate(30px, -15px);
+    transform: scale(0) translate(15px, -15px);
     transform-origin: 0 0 0;
     transition: 0.5s transform 0.3s;
   }
   #checkbox:checked + label svg #grp2 #oval2 {
-    transform: scale(0) translate(60px, -15px);
+    transform: scale(0) translate(30px, -15px);
     transform-origin: 0 0 0;
     transition: 1.5s transform 0.3s;
   }
@@ -325,12 +325,12 @@ s .form-signin .btn {
     transition: 0.1s all 0.3s;
   }
   #checkbox:checked + label svg #grp3 #oval1 {
-    transform: scale(0) translate(30px, 0px);
+    transform: scale(0) translate(15px, 0px);
     transform-origin: 0 0 0;
     transition: 0.5s transform 0.3s;
   }
   #checkbox:checked + label svg #grp3 #oval2 {
-    transform: scale(0) translate(60px, 10px);
+    transform: scale(0) translate(30px, 10px);
     transform-origin: 0 0 0;
     transition: 1.5s transform 0.3s;
   }
@@ -339,7 +339,7 @@ s .form-signin .btn {
     transition: 0.1s all 0.3s;
   }
   #checkbox:checked + label svg #grp4 #oval1 {
-    transform: scale(0) translate(30px, 15px);
+    transform: scale(0) translate(15px, 15px);
     transform-origin: 0 0 0;
     transition: 0.5s transform 0.3s;
   }
@@ -479,3 +479,22 @@ s .form-signin .btn {
       transform: scale(1);
     }
   }
+
+  /* ---------------Link--------------- */
+  a.custom-card,
+  a.custom-card:hover {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* --------- CARD HOVER ------- */
+
+.card-c {
+  box-shadow: 0px 0px 0px #999;
+  transition: 0.1s;
+
+}
+
+.card-c:hover {
+  box-shadow: 3px 5px 5px #999;
+}

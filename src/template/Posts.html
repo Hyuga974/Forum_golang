@@ -3,24 +3,18 @@
 <br>
 <div class="container">
     <div>
-    {{ range $categories := .Posts_Info.AllCategories }}
         <h4 class="d-flex justify-content-between">
-        <span class="badge rounded-pill bg-primary text-dark">$categories</span>
-        <span class="badge rounded-pill bg-secondary">Secondary</span>
-        <span class="badge rounded-pill bg-success">Success</span>
-        <span class="badge rounded-pill bg-danger">Danger</span>
-        <span class="badge rounded-pill bg-warning text-dark">Warning</span>
-        <span class="badge rounded-pill bg-info text-dark">Info</span>
-        <span class="badge rounded-pill bg-light text-dark">Light</span>
-        <span class="badge rounded-pill bg-dark">Dark</span>
+            {{ range $categories := .Post_Info.AllCategories }}
+            <span class="badge rounded-pill" style="background-color:{{ $categories.Color }};">{{ $categories.Cat }}</span>
+            {{ end }}
         </h4>
-        {{ end }}
     </div>
 </div>
 <br>
 <div class="container" style="padding-bottom: 0px; margin-bottom: 0px; border-bottom: 0px;">
    <p>Filtres</p> 
 </div>
+
 <div class="container" style="border-top: 2px solid black">
     <br>
     <div class="row">
@@ -47,80 +41,21 @@
 </div>
 <div class="container mt-5">
     <div class="row g-2">
+    {{ range $post := .All_Posts }}
         <div class="col">
             <div class="bg-light">
-                <div class="card">
-                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
+                <a href="/post?id={{ $post.ID }}" class="custom-card">
+                    <div class="card positon-relative card-c">
+                        <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                            <h5 class="card-title">{{$post.Title}}</h5>
+                            <p class="card-text text-truncate">{{ $post.Body }}</p>
+                            <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ $post.Comment_Nb}} - ❤️ {{ $post.Likes}} -  <img src="{{ $post.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
-        <div class="col">
-            <div class="bg-light">
-                <div class="card">
-                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="bg-light">
-                <div class="card">
-                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row g-2 mt-2">
-        <div class="col">
-            <div class="bg-light">
-                <div class="card">
-                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="bg-light">
-                <div class="card">
-                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="bg-light">
-                <div class="card">
-                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                        <div style="font-size:10px;float:right;">--- 3k | ❤️ 6k | image profil Jean</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{ end }}
     </div>
 </div>
 

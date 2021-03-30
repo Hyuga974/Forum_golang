@@ -147,6 +147,7 @@ func GetPost(user_id int) []POSTINFO {
 
 	post, err := db.Query("SELECT * FROM Posts WHERE user_id=" + strconv.Itoa(user_id) + " ORDER BY id DESC")
 
+	color := RandomColor()
 	var id string
 	var title string
 	var body string
@@ -162,7 +163,8 @@ func GetPost(user_id int) []POSTINFO {
 		var tabCategories []CATEGORIES
 		for _, x := range cat {
 			catephemere := CATEGORIES{
-				Cat: x,
+				Cat:   x,
+				Color: color[x],
 			}
 			tabCategories = append(tabCategories, catephemere)
 		}
@@ -205,4 +207,18 @@ func String(u uuid.UUID) string {
 	hex.Encode(buf[24:], u[10:])
 
 	return string(buf)
+}
+
+func RandomColor() map[string]string {
+	allColor := map[string]string{
+		"informatique": "#19A9D1",
+		"anime/manga":  "#D50C2E",
+		"jeux vidéos":  "#23C009",
+		"sport":        "#9D84C9",
+		"economie":     "#C3C020",
+		"voyage":       "#00FF12",
+		"NEWS":         "#CDC8C6",
+		"paranormal":   "#070709",
+	}
+	return allColor
 }

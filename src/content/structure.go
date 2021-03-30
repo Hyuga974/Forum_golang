@@ -4,11 +4,13 @@ import "time"
 
 //POSTINFO: Informations pour un Post
 type ALLINFO struct {
-	User_Info      INFO
-	Post_Info      POSTINFO
-	Post_User_Info INFO
+	User_Info INFO
+	Post_Info POSTINFO
 
+	All_User            []INFO
+	All_Posts           []POSTINFO
 	Post_Most_Recent    []POSTINFO
+	Post_Most_Likes     []POSTINFO
 	Currently_Post_Like string
 }
 
@@ -39,6 +41,8 @@ type POSTINFO struct {
 	Likes         int
 	Comment_Nb    int
 	All_Comments  []COMMENT
+
+	Post_User_Info INFO
 }
 
 type COMMENT struct {
@@ -50,7 +54,8 @@ type COMMENT struct {
 }
 
 type CATEGORIES struct {
-	Cat string
+	Cat   string
+	Color string
 }
 
 //COOKIE: cookie

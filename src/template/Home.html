@@ -1,7 +1,7 @@
 {{ template "main" . }} {{ define "body" }}
-<div class="container-fluid border shadow rounded">
+<div class="" style="margin-top: -10px; overflow-x: hidden;">
     <div class="row">
-        <div class="col-sm delimitation" style="height: 1%;">
+        <div class="col-sm">
             <div id="parallax">
                 <h1></h1>
             </div>
@@ -16,9 +16,9 @@
                         let _h = window.innerHeight / 2;
                         let _mouseX = e.clientX;
                         let _mouseY = e.clientY;
-                        let _depth1 = `${50 - (_mouseX - _w) * 0.005}% ${50 - (_mouseY - _h) * 0.01}%`;
-                        let _depth2 = `${50 - (_mouseX - _w) * 0.01}% ${50 - (_mouseY - _h) * 0.02}%`;
-                        let _depth3 = `${50 - (_mouseX - _w) * 0.02}% ${50 - (_mouseY - _h) * 0.03}%`;
+                        let _depth1 = `${50 - (_mouseX - _w) * 0.001}% ${50 - (_mouseY - _h) * 0.005}%`;
+                        let _depth2 = `${50 - (_mouseX - _w) * 0.002}% ${50 - (_mouseY - _h) * 0.01}%`;
+                        let _depth3 = `${50 - (_mouseX - _w) * 0.003}% ${50 - (_mouseY - _h) * 0.02}%`;
                         let x = `${_depth3}, ${_depth2}, ${_depth1}`;
                         console.log(x);
                         elem.style.backgroundPosition = x;
@@ -29,76 +29,54 @@
         </div>
     </div>
 </div>
+
 <div class="container mt-5">
-    <div class="row g-2">
-        <div class="col">
-            <div class="bg-light">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ .Post_Info.Title }}</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="bg-light">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="bg-light">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
+<h4 style="@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&display=swap'); font-family: Comfortaa; "><b>Les Posts les plus recents :</b></h4>
     <div class="row g-2 mt-2">
-        <div class="col">
+    {{ range $recentPost := .Post_Most_Recent }}
+        <div class="col" style="max-width: 430px;">
             <div class="bg-light">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><a href="/home" class="text-decoration-none text-reset">Special title treatment</a></h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                <a href="/post?id={{ $recentPost.ID }}" class="custom-card">
+                    <div class="card card-c">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $recentPost.Title }}</h5>
+                            <span style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ $recentPost.Comment_Nb}} - ❤️ {{ $recentPost.Likes}} -  <img src="{{ $recentPost.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </span>
+                            <div> 
+                                {{ range $cat := $recentPost.Categories}}
+                                <span class="badge rounded-pill" style="background-color:{{ $cat.Color }};">{{ $cat.Cat }}</span>
+                                {{ end }}
+                            </div>
+                            <p class="card-text text-truncate">{{ $recentPost.Body}}</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
-        <div class="col">
+        {{ end }}
+    </div>
+<h4 style="@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&display=swap'); font-family: Comfortaa; "><b>Les Posts les plus aimés :</b></h4>
+    <div class="row g-2 mt-2">
+    {{ range $likePost := .Post_Most_Likes }}
+        <div class="col" style="max-width: 33%;">
             <div class="bg-light">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                <a href="/post?id={{ $likePost.ID }}" class="custom-card">
+                    <div class="card card-c">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $likePost.Title }}</h5>
+                            <span style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ $likePost.Comment_Nb}} - ❤️ {{ $likePost.Likes}} -  <img src="{{ $likePost.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </span>
+                            <div> 
+                                {{ range $cat := $likePost.Categories}}
+                                <span class="badge rounded-pill" style="background-color:{{ $cat.Color }};">{{ $cat.Cat }}</span>
+                                {{ end }}
+                            </div>
+                            <p class="card-text text-truncate">{{ $likePost.Body}}</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
-        <div class="col">
-            <div class="bg-light">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">content post</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{ end }}
     </div>
 </div>
 <!-- <div class="container">

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"text/template"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Profil(w http.ResponseWriter, r *http.Request) {
@@ -54,12 +56,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		image := "https://i.imgur.com/pMtf7R9.png"
 		country := r.FormValue("country")
 		confirm := r.FormValue("psw-confirmation")
+		Crypted := []byte(password)
+		Crypted, _ = bcrypt.GenerateFromPassword(Crypted, 10)
 
 		if username != "" || email != "" || password != "" {
 			if password != confirm {
 				msg = "Les deux mots de passe ne sont pas identiques"
 			} else {
-				_, err := datab.Exec(username, email, since, description, password, image, country)
+				_, err := datab.Exec(username, email, since, description, Crypted, image, country)
 				if err != nil {
 					if err.Error() == "UNIQUE constraint failed: Users.email" {
 						msg = "Cet E-Mail est déjà utilisé par un autre utilisateur"
@@ -119,31 +123,37 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			mailfound := false
 			var id int
 			var email string
-			var password string
+			var Password string
 			var username string
 			var since string
 			var description string
 			var image string
 			var country string
 			for test.Next() {
-				err = test.Scan(&id, &username, &email, &since, &description, &password, &image, &country)
+				err = test.Scan(&id, &username, &email, &since, &description, &Password, &image, &country)
 				CheckErr(err)
 				fmt.Println(id)
 				fmt.Println(email)
-				fmt.Println(password)
-				if email == r.FormValue("mail") {
-					mailfound = true
-					break
-				}
+				fmt.Println(Password)
 			}
+			mdp := r.FormValue("password")
+			fmt.Printf("mdp entré : %s", mdp)
+			if email == r.FormValue("mail") {
+				mailfound = true
+			}
+
 			test.Close()
 			if mailfound {
-				if password == r.FormValue("password") {
+				fmt.Println(mdp)
+				fmt.Println(Password)
+				cryptedPassword := []byte(Password)
+				fmt.Println(bcrypt.CompareHashAndPassword(cryptedPassword, []byte(mdp)))
+				if bcrypt.CompareHashAndPassword(cryptedPassword, []byte(mdp)) == nil {
 					CookieCreation(w, id)
 					userinfo = INFO{
 						ID:          id,
 						Email:       email,
-						PassWord:    password,
+						PassWord:    mdp,
 						UserName:    username,
 						Since:       since,
 						Description: description,

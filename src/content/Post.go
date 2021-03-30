@@ -16,6 +16,8 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 		var Post POSTINFO
 		var tabCat []CATEGORIES
 
+		color := RandomColor()
+
 		//sport, anime/manga, economie, jeux vidéo, informatique, voyages, NEW, paranormal.
 		allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
 		tabCategories := strings.Split(allCategories, ";")
@@ -55,7 +57,8 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 			tabCategoriesCheck := strings.Split(categoriesCheck, ";")
 			for _, x := range tabCategoriesCheck {
 				oneCategorie := CATEGORIES{
-					Cat: x,
+					Cat:   x,
+					Color: color[x],
 				}
 				tabCat = append(tabCat, oneCategorie)
 			}
@@ -88,7 +91,8 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 		} else {
 			for _, x := range tabCategories {
 				oneCategorie := CATEGORIES{
-					Cat: x,
+					Cat:   x,
+					Color: color[x],
 				}
 				tabCat = append(tabCat, oneCategorie)
 			}
@@ -101,7 +105,6 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 			Post_Info: Post,
 		}
 
-		fmt.Println(Post)
 		files := []string{"template/CreatePost.html", "template/Common.html"}
 		tmp, err := template.ParseFiles(files...)
 		if err != nil {
@@ -118,15 +121,16 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("LA")
 		http.Redirect(w, r, "/login", 301)
 	}
-	fmt.Println("Test posts")
 }
 
 //OnePost : Page pour un seul post
 func OnePost(w http.ResponseWriter, r *http.Request) {
 	userInfo := GetSession(r)
+	color := RandomColor()
 
 	likeNow := ""
 	likes := 0
+	commentnb := 0
 
 	post_id := r.FormValue("id")
 	upost_id, err := strconv.Atoi(post_id)
@@ -162,8 +166,30 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		comment := r.FormValue("comment")
 
 		if userInfo.UserName != "" {
-			if r.FormValue("Liker") != "" {
+			if comment != "" {
+				datab, err := db.Prepare("INSERT INTO Comments (body, user_id,post_id) VALUES (?,?,?)")
+				if err != nil {
+					fmt.Println(err)
+					http.Error(w, "Server Error", 500)
+				}
+
+				fmt.Println(comment)
+				user_id := userInfo.ID
+				fmt.Println(user_id)
+				post_id := upost_id
+				fmt.Println(upost_id)
+				fmt.Println("ICI")
+				result, err := datab.Exec(comment, user_id, post_id)
+				fmt.Println(result)
+				if err != nil {
+					fmt.Println(err)
+					fmt.Println("Une erreur ici")
+				}
+				datab.Close()
+			} else {
 				if !dejaLike {
+					fmt.Println("je suis dans le if")
+
 					datab, err := db.Prepare("INSERT INTO Likes (user_id,post_id) VALUES (?,?)")
 					if err != nil {
 						fmt.Println(err)
@@ -195,45 +221,30 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 					}
 					dataPost.Close()
 
-					upost_id := strconv.Itoa(post_id)
-					dataLikes, _ := db.Query("SELECT * FROM Likes WHERE post_id=" + upost_id)
-					for dataLikes.Next() {
-						err = dataLikes.Scan(&id, &upost_id, &user_id)
-						CheckErr(err)
-						likes++
-					}
-					dataLikes.Close()
+					likeNow = "checked"
 
-					datab, err = db.Prepare("UPDATE Posts SET likes=? WHERE id=" + strconv.Itoa(post_id))
-					fmt.Print("208 : ")
-					fmt.Println(likes)
-					datab.Exec(likes)
-					datab.Close()
 				} else {
-					fmt.Println(" Tu as déjà like ce post")
-				}
-				likeNow = "checked"
+					fmt.Printf("Post id : %s", post_id)
+					upost_id, err := strconv.Atoi(post_id)
+					CheckErr(err)
+					fmt.Printf("User id : %d", userInfo.ID)
+					stmt, err := db.Prepare("delete from Likes where user_id=? AND post_id=?")
+					CheckErr(err)
 
-			} else if comment != "" {
-				datab, err := db.Prepare("INSERT INTO Comments (body, user_id,post_id) VALUES (?,?,?)")
-				if err != nil {
-					fmt.Println(err)
-					http.Error(w, "Server Error", 500)
-				}
+					res, err := stmt.Exec(userInfo.ID, upost_id)
+					CheckErr(err)
 
-				fmt.Println(comment)
-				user_id := userInfo.ID
-				fmt.Println(user_id)
-				post_id := upost_id
-				fmt.Println(upost_id)
-				fmt.Println("ICI")
-				result, err := datab.Exec(comment, user_id, post_id)
-				fmt.Println(result)
-				if err != nil {
-					fmt.Println(err)
-					fmt.Println("Une erreur ici")
+					affect, err := res.RowsAffected()
+					CheckErr(err)
+
+					fmt.Println(affect)
+
+					stmt.Close()
+
+					fmt.Println("Tu viens de unlike ce post")
+
+					likeNow = ""
 				}
-				datab.Close()
 			}
 		} else {
 			fmt.Println("LA")
@@ -318,6 +329,36 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	}
 	getComment.Close()
 
+	likes = 0
+	dataLikes, _ := db.Query("SELECT * FROM Likes WHERE post_id=" + post_id)
+	for dataLikes.Next() {
+		err = dataLikes.Scan(&id, &upost_id, &user_id)
+		CheckErr(err)
+		likes++
+		fmt.Printf("nb likes pendant la boucle: %d", likes)
+	}
+	dataLikes.Close()
+
+	datab, err := db.Prepare("UPDATE Posts SET likes=? WHERE id=" + post_id)
+	CheckErr(err)
+	datab.Exec(likes)
+	datab.Close()
+
+	commentnb = 0
+	dataComment, _ := db.Query("SELECT * FROM Comments WHERE post_id=" + post_id)
+	for dataComment.Next() {
+		err = dataComment.Scan(&id, &body, &user_id, &upost_id)
+		CheckErr(err)
+		commentnb++
+		fmt.Printf("nb commentaires pendant la boucle: %d", commentnb)
+	}
+	dataComment.Close()
+
+	datab, err = db.Prepare("UPDATE Posts SET comment_nb=? WHERE id=" + post_id)
+	CheckErr(err)
+	datab.Exec(commentnb)
+	datab.Close()
+
 	//récupération du post
 	fmt.Println("récupération du post")
 	test, err := db.Query("SELECT * FROM Posts WHERE id=" + post_id)
@@ -327,17 +368,15 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	for test.Next() {
 		err = test.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb)
 		CheckErr(err)
-		fmt.Print("test.Next: ")
-		fmt.Println(likes)
 	}
 	test.Close()
 
-	fmt.Println(title)
 	tabCategories := strings.Split(categories, ";")
 	var tabCat []CATEGORIES
 	for _, x := range tabCategories {
 		oneCategorie := CATEGORIES{
-			Cat: x,
+			Cat:   x,
+			Color: color[x],
 		}
 		tabCat = append(tabCat, oneCategorie)
 	}
@@ -377,28 +416,23 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	user.Close()
 
 	post_info := POSTINFO{
-		ID:           upost_id,
-		User_ID:      post_user_info.ID,
-		Title:        title,
-		Body:         body,
-		Image:        image,
-		Categories:   tabCat,
-		Likes:        likes,
-		Comment_Nb:   comments_nb,
-		All_Comments: allComments,
+		ID:             upost_id,
+		User_ID:        post_user_info.ID,
+		Title:          title,
+		Body:           body,
+		Image:          image,
+		Categories:     tabCat,
+		Likes:          likes,
+		Comment_Nb:     comments_nb,
+		All_Comments:   allComments,
+		Post_User_Info: post_user_info,
 	}
-
-	fmt.Println(post_info)
 
 	data := ALLINFO{
 		User_Info:           userInfo,
 		Post_Info:           post_info,
-		Post_User_Info:      post_user_info,
 		Currently_Post_Like: likeNow,
 	}
-
-	fmt.Print("Nb Likes ")
-	fmt.Println(data.Post_Info.Likes)
 
 	defer db.Close()
 
@@ -425,24 +459,139 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 // AllPosts : kzdnzndz
 func AllPosts(w http.ResponseWriter, r *http.Request) {
 	user := GetSession(r)
+	color := RandomColor()
 
 	allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
 	tabCategories := strings.Split(allCategories, ";")
 	var tabCat []CATEGORIES
 	for _, x := range tabCategories {
 		oneCategorie := CATEGORIES{
-			Cat: x,
+			Cat:   x,
+			Color: color[x],
 		}
 		tabCat = append(tabCat, oneCategorie)
 	}
 
-	post := POSTINFO{
+	var all_Post []POSTINFO
+	var post_info POSTINFO
+
+	db, err := sql.Open("sqlite3", "database/database.db")
+
+	post, err := db.Query("SELECT * FROM Posts ORDER BY id DESC")
+
+	var id string
+	var user_id int
+	var title string
+	var body string
+	var image string
+	var likes int
+	var comment_nb int
+	var categories string
+	for post.Next() {
+		err = post.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb)
+		CheckErr(err)
+		idInt, _ := strconv.Atoi(id)
+		cat := strings.Split(categories, ";")
+		var tabCategories []CATEGORIES
+		for _, x := range cat {
+			catephemere := CATEGORIES{
+				Cat:   x,
+				Color: color[x],
+			}
+			tabCategories = append(tabCategories, catephemere)
+		}
+
+		tabusers, err := db.Query("SELECT * FROM Users")
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		var userinfo INFO
+		var userAllPost []POSTINFO
+		var userID int
+		var username string
+		var email string
+		var since string
+		var description string
+		var password string
+		var country string
+		for tabusers.Next() {
+			err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
+			CheckErr(err)
+			if userID == user_id {
+				userAllPost = GetPost(userID)
+				userinfo = INFO{
+					ID:          userID,
+					Email:       email,
+					PassWord:    password,
+					UserName:    username,
+					Since:       since,
+					Description: description,
+					Image:       image,
+					Country:     country,
+					AllPosts:    userAllPost,
+				}
+				break
+			}
+		}
+		tabusers.Close()
+
+		post_info = POSTINFO{
+			ID:         idInt,
+			User_ID:    user_id,
+			Title:      title,
+			Body:       body,
+			Image:      image,
+			Categories: tabCategories,
+			Likes:      likes,
+			Comment_Nb: comment_nb,
+
+			Post_User_Info: userinfo,
+		}
+		all_Post = append(all_Post, post_info)
+	}
+	post.Close()
+
+	var allUsers []INFO
+
+	users, err := db.Query("SELECT * FROM Posts ORDER BY id DESC")
+	var currentlyUser INFO
+	var email string
+	var password string
+	var username string
+	var since string
+	var description string
+	var country string
+	for users.Next() {
+		err = users.Scan(&id, &username, &email, &since, &description, &password, &image, &country)
+		CheckErr(err)
+
+		idInt, _ := strconv.Atoi(id)
+		currentlyUser = INFO{
+			ID:          idInt,
+			Email:       email,
+			PassWord:    password,
+			UserName:    username,
+			Since:       since,
+			Description: description,
+			Image:       image,
+			Country:     country,
+		}
+		allUsers = append(allUsers, currentlyUser)
+	}
+	users.Close()
+
+	db.Close()
+
+	postInfo := POSTINFO{
 		AllCategories: tabCat,
 	}
 
 	data := ALLINFO{
 		User_Info: user,
-		Post_Info: post,
+		Post_Info: postInfo,
+
+		All_User:  allUsers,
+		All_Posts: all_Post,
 	}
 
 	files := []string{"template/Posts.html", "template/Common.html"}
