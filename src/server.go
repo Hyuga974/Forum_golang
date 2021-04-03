@@ -40,6 +40,7 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 
 	var post content.POSTINFO
 	var mostRecent []content.POSTINFO
+	var since string
 	var post_id int
 	var title string
 	var categories string
@@ -49,7 +50,7 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 	var likes int
 	var comments_nb int
 	for allPosts.Next() {
-		err = allPosts.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb)
+		err = allPosts.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb, &since)
 		content.CheckErr(err)
 
 		cat := strings.Split(categories, ";")
@@ -116,7 +117,7 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 	allPosts, _ = db.Query("SELECT * FROM Posts ORDER BY likes DESC LIMIT 3")
 	var mostLikes []content.POSTINFO
 	for allPosts.Next() {
-		err = allPosts.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb)
+		err = allPosts.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb, &since)
 		content.CheckErr(err)
 
 		cat := strings.Split(categories, ";")

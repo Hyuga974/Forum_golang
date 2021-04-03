@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"text/template"
 	"time"
 
@@ -11,7 +12,41 @@ import (
 )
 
 func Profil(w http.ResponseWriter, r *http.Request) {
+
 	user := GetSession(r)
+
+	if r.Method == "POST" {
+		old_Description := user.Description
+		old_Username := user.UserName
+		old_Country := user.Country
+		var new_Username string
+		var new_Description string
+		var new_Country string
+		if r.FormValue("Username") != "" {
+			new_Username = r.FormValue("Username")
+		} else {
+			new_Username = old_Username
+		}
+		if r.FormValue("Description") != "" {
+			new_Description = r.FormValue("Description")
+		} else {
+			new_Description = old_Description
+		}
+
+		if r.FormValue("country") != "" {
+			new_Country = r.FormValue("country")
+		} else {
+			new_Country = old_Country
+		}
+
+		db, _ := sql.Open("sqlite3", "database/database.db")
+		datab, err := db.Prepare("UPDATE Users SET username=?, description=?, country=? WHERE id=" + strconv.Itoa(user.ID))
+		CheckErr(err)
+		datab.Exec(new_Username, new_Description, new_Country)
+		datab.Close()
+
+		user = GetSession(r)
+	}
 
 	data := ALLINFO{
 		User_Info: user,
@@ -40,6 +75,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Server Error", 500)
 	}
 	msg := " "
+	allcountry := getPays()
 	if r.Method == "POST" {
 		datab, err := db.Prepare("INSERT INTO Users (username, email, since, description, password, image, country) VALUES (?, ?, ?, ?, ?, ?, ?)")
 		if err != nil {
@@ -81,7 +117,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := ALLINFO{
-		User_Info: Info,
+		User_Info:   Info,
+		All_Country: allcountry,
 	}
 
 	files := []string{"template/Register.html", "template/Common.html"}

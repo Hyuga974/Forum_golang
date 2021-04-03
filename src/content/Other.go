@@ -148,6 +148,7 @@ func GetPost(user_id int) []POSTINFO {
 	post, err := db.Query("SELECT * FROM Posts WHERE user_id=" + strconv.Itoa(user_id) + " ORDER BY id DESC")
 
 	color := RandomColor()
+	var since string
 	var id string
 	var title string
 	var body string
@@ -156,7 +157,7 @@ func GetPost(user_id int) []POSTINFO {
 	var comment_nb int
 	var categories string
 	for post.Next() {
-		err = post.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb)
+		err = post.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
 		CheckErr(err)
 		idInt, _ := strconv.Atoi(id)
 		cat := strings.Split(categories, ";")
@@ -177,6 +178,7 @@ func GetPost(user_id int) []POSTINFO {
 			Categories: tabCategories,
 			Likes:      likes,
 			Comment_Nb: comment_nb,
+			Since:      since,
 		}
 		all_Post = append(all_Post, post_info)
 	}

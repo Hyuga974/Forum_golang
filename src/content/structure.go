@@ -8,6 +8,7 @@ type ALLINFO struct {
 	Post_Info POSTINFO
 
 	All_User            []INFO
+	All_Country         []string
 	All_Posts           []POSTINFO
 	Post_Most_Recent    []POSTINFO
 	Post_Most_Likes     []POSTINFO
@@ -41,6 +42,8 @@ type POSTINFO struct {
 	Likes         int
 	Comment_Nb    int
 	All_Comments  []COMMENT
+	Since         string
+	Deletable     bool
 
 	Post_User_Info INFO
 }

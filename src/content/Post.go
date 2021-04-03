@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
 )
 
 func CreationPost(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +28,7 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method == "POST" {
 			fmt.Println("ici")
-			datab, err := db.Prepare("INSERT INTO Posts (title, categories, body, user_id, image, likes, comment_nb) VALUES (?,?,?,?,?,?,?)")
+			datab, err := db.Prepare("INSERT INTO Posts (title, categories, body, user_id, image, likes, comment_nb, since) VALUES (?,?,?,?,?,?,?, ?)")
 			if err != nil {
 				fmt.Println(err)
 				http.Error(w, "Server Error", 500)
@@ -37,19 +38,20 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 			image := r.FormValue("myFile")
 			likes := 0
 			comment_nb := 0
-
-			fmt.Printf("image= %T\n", image)
-
 			var categoriesCheck string
 			for _, categorie := range tabCategories {
 				if r.FormValue(categorie) != "" {
 					categoriesCheck += categorie + ";"
 				}
 			}
+			loc, _ := time.LoadLocation("Europe/Paris")
+			pretime := time.Now().In(loc)
+			since := pretime.String()[:19]
 
 			if title != "" && body != "" && categoriesCheck != "" {
 				user_id := user.ID
-				_, err := datab.Exec(title, categoriesCheck, body, user_id, image, likes, comment_nb)
+
+				_, err := datab.Exec(title, categoriesCheck, body, user_id, image, likes, comment_nb, since)
 				if err != nil {
 					fmt.Println(err.Error())
 				}
@@ -68,6 +70,7 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 				Body:       body,
 				Image:      image,
 				Categories: tabCat,
+				Since:      since,
 			}
 
 			uId := strconv.Itoa(user.ID)
@@ -81,7 +84,7 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 			var categories string
 			var user_id int
 			for newPost.Next() {
-				err = newPost.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb)
+				err = newPost.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
 				CheckErr(err)
 			}
 			newPost.Close()
@@ -144,9 +147,10 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	var id int
 	var idPost int
 	var idUser int
+	var since string
 	var dejaLike bool = false
 	for like.Next() {
-		err = like.Scan(&id, &idPost, &idUser)
+		err = like.Scan(&id, &idPost, &idUser, &since)
 		CheckErr(err)
 		if idPost == upost_id {
 			dejaLike = true
@@ -167,7 +171,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 
 		if userInfo.UserName != "" {
 			if comment != "" {
-				datab, err := db.Prepare("INSERT INTO Comments (body, user_id,post_id) VALUES (?,?,?)")
+				datab, err := db.Prepare("INSERT INTO Comments (body, user_id,post_id,since) VALUES (?,?,?,?)")
 				if err != nil {
 					fmt.Println(err)
 					http.Error(w, "Server Error", 500)
@@ -179,7 +183,10 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 				post_id := upost_id
 				fmt.Println(upost_id)
 				fmt.Println("ICI")
-				result, err := datab.Exec(comment, user_id, post_id)
+				loc, _ := time.LoadLocation("Europe/Paris")
+				pretime := time.Now().In(loc)
+				since := pretime.String()[:19]
+				result, err := datab.Exec(comment, user_id, post_id, since)
 				fmt.Println(result)
 				if err != nil {
 					fmt.Println(err)
@@ -187,63 +194,90 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 				}
 				datab.Close()
 			} else {
-				if !dejaLike {
-					fmt.Println("je suis dans le if")
-
-					datab, err := db.Prepare("INSERT INTO Likes (user_id,post_id) VALUES (?,?)")
-					if err != nil {
-						fmt.Println(err)
-						http.Error(w, "Server Error", 500)
-					}
-					user_id := userInfo.ID
-					post_id := upost_id
-					_, err = datab.Exec(user_id, post_id)
-					if err != nil {
-						fmt.Println(err)
-						fmt.Println("Une erreur ici")
-					}
-					datab.Close()
-					fmt.Println("Tu viens de like ce post")
-
-					dataPost, err := db.Query("SELECT * FROM Posts WHERE id=" + strconv.Itoa(post_id))
-					if err != nil {
-						fmt.Println(err.Error())
-					}
-					likes = 0
-					var title string
-					var categories string
-					var body string
-					var image string
-					var comments_nb int
-					for dataPost.Next() {
-						err = dataPost.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb)
-						CheckErr(err)
-					}
-					dataPost.Close()
-
-					likeNow = "checked"
-
-				} else {
+				if r.FormValue("Suppr") != "" {
 					fmt.Printf("Post id : %s", post_id)
 					upost_id, err := strconv.Atoi(post_id)
-					CheckErr(err)
-					fmt.Printf("User id : %d", userInfo.ID)
-					stmt, err := db.Prepare("delete from Likes where user_id=? AND post_id=?")
-					CheckErr(err)
+					if userInfo.ID == upost_id {
 
-					res, err := stmt.Exec(userInfo.ID, upost_id)
-					CheckErr(err)
+						CheckErr(err)
+						fmt.Printf("User id : %d", userInfo.ID)
+						stmt, err := db.Prepare("delete from Posts where user_id=? AND post_id=?")
+						CheckErr(err)
 
-					affect, err := res.RowsAffected()
-					CheckErr(err)
+						res, err := stmt.Exec(userInfo.ID, upost_id)
+						CheckErr(err)
 
-					fmt.Println(affect)
+						affect, err := res.RowsAffected()
+						CheckErr(err)
 
-					stmt.Close()
+						fmt.Println(affect)
 
-					fmt.Println("Tu viens de unlike ce post")
+						stmt.Close()
+					} else {
+						fmt.Println("Vous ne pouvez pas supprimer")
+					}
+				} else {
+					if !dejaLike {
+						fmt.Println("je suis dans le if")
 
-					likeNow = ""
+						loc, _ := time.LoadLocation("Europe/Paris")
+						pretime := time.Now().In(loc)
+						since := pretime.String()[:19]
+						datab, err := db.Prepare("INSERT INTO Likes (user_id,post_id,since) VALUES (?,?,?)")
+						if err != nil {
+							fmt.Println(err)
+							http.Error(w, "Server Error", 500)
+						}
+						user_id := userInfo.ID
+						post_id := upost_id
+						_, err = datab.Exec(user_id, post_id, since)
+						if err != nil {
+							fmt.Println(err)
+							fmt.Println("Une erreur ici")
+						}
+						datab.Close()
+						fmt.Println("Tu viens de like ce post")
+
+						dataPost, err := db.Query("SELECT * FROM Posts WHERE id=" + strconv.Itoa(post_id))
+						if err != nil {
+							fmt.Println(err.Error())
+						}
+						likes = 0
+						var title string
+						var categories string
+						var body string
+						var image string
+						var comments_nb int
+						for dataPost.Next() {
+							err = dataPost.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb, &since)
+							CheckErr(err)
+						}
+						dataPost.Close()
+
+						likeNow = "checked"
+
+					} else {
+						fmt.Printf("Post id : %s", post_id)
+						upost_id, err := strconv.Atoi(post_id)
+						CheckErr(err)
+						fmt.Printf("User id : %d", userInfo.ID)
+						stmt, err := db.Prepare("delete from Likes where user_id=? AND post_id=?")
+						CheckErr(err)
+
+						res, err := stmt.Exec(userInfo.ID, upost_id)
+						CheckErr(err)
+
+						affect, err := res.RowsAffected()
+						CheckErr(err)
+
+						fmt.Println(affect)
+
+						stmt.Close()
+
+						fmt.Println("Tu viens de unlike ce post")
+
+						likeNow = ""
+					}
 				}
 			}
 		} else {
@@ -264,6 +298,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	var comments_nb int
 	var allComments []COMMENT
 	var user_id int
+	var deletable bool
 
 	getComment, err := db.Query("SELECT * FROM Comments WHERE post_id=" + post_id)
 	if err != nil {
@@ -273,7 +308,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	var comment_id int
 	var bodyComment string
 	for getComment.Next() {
-		err = getComment.Scan(&comment_id, &bodyComment, &user_id, &id_Post)
+		err = getComment.Scan(&comment_id, &bodyComment, &user_id, &id_Post, &since)
 		CheckErr(err)
 		if upost_id == id_Post {
 			oneComment := COMMENT{
@@ -293,7 +328,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 			var email string
 			var password string
 			var username string
-			var since string
 			var description string
 			var image2 string
 			var country string
@@ -332,7 +366,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	likes = 0
 	dataLikes, _ := db.Query("SELECT * FROM Likes WHERE post_id=" + post_id)
 	for dataLikes.Next() {
-		err = dataLikes.Scan(&id, &upost_id, &user_id)
+		err = dataLikes.Scan(&id, &upost_id, &user_id, &since)
 		CheckErr(err)
 		likes++
 		fmt.Printf("nb likes pendant la boucle: %d", likes)
@@ -347,7 +381,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	commentnb = 0
 	dataComment, _ := db.Query("SELECT * FROM Comments WHERE post_id=" + post_id)
 	for dataComment.Next() {
-		err = dataComment.Scan(&id, &body, &user_id, &upost_id)
+		err = dataComment.Scan(&id, &body, &user_id, &upost_id, &since)
 		CheckErr(err)
 		commentnb++
 		fmt.Printf("nb commentaires pendant la boucle: %d", commentnb)
@@ -366,7 +400,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err.Error())
 	}
 	for test.Next() {
-		err = test.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb)
+		err = test.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb, &since)
 		CheckErr(err)
 	}
 	test.Close()
@@ -392,7 +426,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	var email string
 	var password string
 	var username string
-	var since string
 	var description string
 	var image2 string
 	var country string
@@ -415,6 +448,9 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Close()
 
+	if post_user_info.ID == userInfo.ID {
+		deletable = true
+	}
 	post_info := POSTINFO{
 		ID:             upost_id,
 		User_ID:        post_user_info.ID,
@@ -426,6 +462,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		Comment_Nb:     comments_nb,
 		All_Comments:   allComments,
 		Post_User_Info: post_user_info,
+		Deletable:      deletable,
 	}
 
 	data := ALLINFO{
@@ -479,6 +516,7 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 
 	post, err := db.Query("SELECT * FROM Posts ORDER BY id DESC")
 
+	var since string
 	var id string
 	var user_id int
 	var title string
@@ -488,7 +526,7 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 	var comment_nb int
 	var categories string
 	for post.Next() {
-		err = post.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb)
+		err = post.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
 		CheckErr(err)
 		idInt, _ := strconv.Atoi(id)
 		cat := strings.Split(categories, ";")
@@ -510,7 +548,6 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 		var userID int
 		var username string
 		var email string
-		var since string
 		var description string
 		var password string
 		var country string
@@ -553,14 +590,14 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 
 	var allUsers []INFO
 
-	users, err := db.Query("SELECT * FROM Posts ORDER BY id DESC")
+	users, err := db.Query("SELECT * FROM Users ORDER BY id DESC")
 	var currentlyUser INFO
 	var email string
 	var password string
 	var username string
-	var since string
 	var description string
 	var country string
+
 	for users.Next() {
 		err = users.Scan(&id, &username, &email, &since, &description, &password, &image, &country)
 		CheckErr(err)

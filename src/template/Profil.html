@@ -8,7 +8,7 @@
     myInput.focus()
   })
    </script>
-  
+  <form method="POST"> <!-- Amogus -->
     <div class="media-body mb-5 text-black">
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -19,29 +19,42 @@
           <div class="modal-body">
             <div class="form-group">
               <label class="col-form-label"  for="inputDefault">Username:</label>
-              <input type="text" class="form-control" placeholder="Bah faut écrire ici enculé" id="inputDefault">
+              <input type="text" class="form-control" name="Username" placeholder="Bah faut écrire ici enculé" id="inputDefault">
             </div>
             <form>
             <div class="mb-3">
               <label for="message-text" class="col-form-label">Description:</label>
-              <textarea class="form-control" id="message-text"></textarea>
+              <textarea class="form-control" name="Description" id="message-text"></textarea>
             </div>
-            </form>
-            <div class="drop-zone w-25">
+            <div class="col-md-6">
+              <label for="validationCustom04" class="form-label">Pays :</label>
+              <select name="country" class="form-select" id="validationCustom04">
+              <option selected disabled value="">Choose...</option>
+            {{ range $Pays:= .All_Country}}
+                <option value="{{ $Pays }}">{{ $Pays }}</option>
+              {{ end }}
+            </select>
+              <div class="invalid-feedback">
+                  Veuillez selectionner un pays.
+              </div>
+          </div>
+            <div class="drop-zone w-75">
               <span class="drop-zone__prompt">Drop files here or click to upload</span>
               <!-- <div class="drop-zone__thumb" data-label="myfile.txt"></div> -->
               <input type="file" name="myFile" class="drop-zone__input">
-          </div>
+            </div>
+            </form>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="submit" class="btn btn-primary">Save changes</button>
             </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+  </form>
 <div class="row py-10 px-7">
     <div class="col-sm-2 mx-auto border">
         <!-- Profile widget -->
@@ -172,6 +185,7 @@
       </div>
     </div>
 </div>
+<script src="../assets/main.js"></script>
 
 
 {{ end }}
