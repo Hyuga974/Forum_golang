@@ -126,6 +126,106 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func EditPost(w http.ResponseWriter, r *http.Request) {
+	user := GetSession(r)
+
+	if user.UserName != "" {
+		var post_id int
+		var title string
+		var categories string
+		var body string
+		var user_id int
+		var image string
+		var likes int
+		var comments_nb int 
+		var since int
+		postID := r.FormValue("id")
+		
+		db, err := sql.Open("sqlite3", "database/database.db")
+		CheckErr(err)
+
+		Post, err := db.Query("SELECT * FROM Posts WHERE id=" + postID)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		for Post.Next() {
+			err = Post.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb, &since)
+			CheckErr(err)
+		}
+		Post.Close()
+
+		post_info := POSTINFO{
+			ID:             post_id,
+			User_ID:        user_id,
+			Title:          title,
+			Body:           body,
+			Image:          image,
+			Categories:     tabCat,
+			Likes:          likes,
+			Comment_Nb:     comments_nb,
+			All_Comments:   allComments,
+			Post_User_Info: post_user_info,
+			Deletable:      deletable,
+		}
+
+		tabCategories := strings.Split(categories, ";")
+		var tabCat []CATEGORIES
+		for _, x := range tabCategories {
+			oneCategorie := CATEGORIES{
+				Cat:   x,
+				Color: color[x],
+			}
+			tabCat = append(tabCat, oneCategorie)
+		}
+
+		if user.UserName !=  
+			var Post POSTINFO
+			var tabCat []CATEGORIES
+
+			color := RandomColor()
+
+			//sport, anime/manga, economie, jeux vidéo, informatique, voyages, NEW, paranormal.
+			allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
+			tabCategories := strings.Split(allCategories, ";")
+
+			if r.Method == "POST" {
+				fmt.Println("Modification d'un Post en cours")
+				
+			} else {
+				for _, x := range tabCategories {
+					oneCategorie := CATEGORIES{
+						Cat:   x,
+						Color: color[x],
+					}
+					tabCat = append(tabCat, oneCategorie)
+				}
+				Post = POSTINFO{
+					Categories: tabCat,
+				}
+			}
+			data := ALLINFO{
+				User_Info: user,
+				Post_Info: Post,
+			}
+
+			files := []string{"template/CreatePost.html", "template/Common.html"}
+			tmp, err := template.ParseFiles(files...)
+			if err != nil {
+				fmt.Println(err)
+				http.Error(w, "Server Error: Check template", 500)
+			}
+
+			err = tmp.Execute(w, data)
+			if err != nil {
+				fmt.Println(err)
+				http.Error(w, "Server Error", 500)
+			}
+	} else {
+		fmt.Println("LA")
+		http.Redirect(w, r, "/login", 301)
+	}
+}
+
 //OnePost : Page pour un seul post
 func OnePost(w http.ResponseWriter, r *http.Request) {
 	userInfo := GetSession(r)

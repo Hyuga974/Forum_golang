@@ -111,6 +111,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
+		http.Redirect(w, r, "/login", 301)
 	}
 	Info := INFO{
 		Msg: msg,
@@ -200,6 +201,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 						Msg:         "Vous êtes connecté en tant que " + username,
 					}
 
+					
+					http.Redirect(w, r, "/", 301)
 				} else {
 					userinfo = INFO{
 						Msg: "Le mot de passe est invalide",

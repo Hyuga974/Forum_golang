@@ -20,11 +20,12 @@ func main() {
 	http.HandleFunc("/posts", content.AllPosts)
 	http.HandleFunc("/post", content.OnePost)
 	http.HandleFunc("/newpost", content.CreationPost)
+	http.HandleFunc("/editpost", content.EditPost)
 	http.HandleFunc("/profil", content.Profil)
 	http.HandleFunc("/login", content.Login)
 	http.HandleFunc("/register", content.Register)
 	fmt.Println("Start... ")
-	http.ListenAndServe(":555", nil)
+	http.ListenAndServe(":8080", nil)
 
 }
 
