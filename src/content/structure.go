@@ -61,6 +61,7 @@ type COMMENT struct {
 type CATEGORIES struct {
 	Cat   string
 	Color string
+	Check string
 }
 
 //COOKIE: cookie

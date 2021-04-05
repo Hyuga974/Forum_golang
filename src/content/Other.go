@@ -138,6 +138,7 @@ func GetSession(r *http.Request) INFO {
 		tabusers.Close()
 		db.Close()
 	}
+	fmt.Println("Get session finit")
 	return userinfo
 }
 

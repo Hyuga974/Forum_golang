@@ -5,23 +5,24 @@
         <div class="container">
             <div class="row">
                 <h6 class="d-flex justify-content-center text-danger">{{.User_Info.Msg}}</h6>
+                
                 <form class="row needs-validation" method="POST" novalidate>
                     <div class="dropdown" style="float: right;">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float: right;">
                             Catégories
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            {{ range $categorie:= .Post_Info.Categories}}
-                            <div><input type="checkbox" id="test" name="{{ $categorie.Cat }}" value="{{ $categorie.Cat }}" style="text-align: left; margin-left: 5%;"> {{ $categorie.Cat }}</div>
+                            {{ range $categorie:= .Post_Info.AllCategories}}
+                                <div><input type="checkbox" id="test" name="{{ $categorie.Cat }}" value="{{ $categorie.Cat }}" style="text-align: left; margin-left: 5%;" {{ $categorie.Check}}> {{ $categorie.Cat }}</div>
                             {{ end }}
                         </div>
                     </div>
-                    <input type="text" style="float: left;" class="form-control w-25" name="title" placeholder="Titre du post..." id="validationCustom01" required>
+                    <input type="text" style="float: left;" class="form-control w-25" name="title" value="{{ .Post_Info.Title}}" id="validationCustom01" required>
                     <div class="invalid-feedback" style="float: left;">
                         Veuillez mettre un titre.
                     </div>
-                    <label for="validationTextarea" class="form-label mt-2" style="float: left;">Ajouter du contenu :</label>
-                    <textarea class="form-control w-75" id="validationTextarea" name="body" placeholder="Contenu du post..." style="resize: none; float: left;" cols="2" rows="13" required></textarea>
+                    <label for="validationTextarea" class="form-label mt-2" style="float: left;"></label>
+                    <textarea class="form-control w-75" id="validationTextarea" name="body" value="{{ .Post_Info.Body}}" style="resize: none; float: left;" cols="2" rows="13" required>{{ .Post_Info.Body}}</textarea>
                     <div class="invalid-feedback" style="float: left;">
                         Veuillez entrer le contenu de votre post.
                     </div>
@@ -32,7 +33,7 @@
                     </div>
                     <div class="col-12 mt-3">
                         <a class="btn btn-outline-danger" href="/" style="float: left;">Annuler</a>
-                        <button class="btn btn-outline-success" type="submit" style="float: right;">Publier le post</button>
+                        <button class="btn btn-outline-success" type="submit" style="float: right;">Publier le post modifier</button>
                     </div>
                 </form>
             </div>
