@@ -8,7 +8,7 @@
     myInput.focus()
   })
    </script>
-  <form method="POST"> <!-- Amogus -->
+  <form method="POST">
     <div class="media-body mb-5 text-black">
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -55,8 +55,9 @@
           </div>
         </div>
   </form>
-<div class="row py-10 px-7">
-    <div class="col-sm-2 mx-auto border">
+<div class="container-fluid">
+  <div class="row py-10 px-7">
+    <div class="col-sm-2 mx-auto align-self-center">
         <!-- Profile widget -->
         <!-- <div class="bg-white shadow rounded overflow-hidden" style="float: left;">
             <div class="px-4 pt-0 pb-4 cover">
@@ -95,7 +96,7 @@
             </div>
         </div>
       </div>
-      <div class="col-sm-5 mx-auto border">
+      <div class="col-sm-5 mx-auto align-self-center">
         <!-- <div class="py-4 px-4" style="float: right;">
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <h5 class="mb-0">Recent Post</h5><a href="#" class="btn btn-link text-muted">Show all</a>
@@ -121,14 +122,21 @@
             </div>
         </div> -->
         <div class="row row-cols-1 g-4">
-          <div class="col">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-              </div>
+          {{ range $post := .User_Info.AllPosts }}
+        <div class="col">
+            <div class="bg-light">
+                <a href="/post?id={{ $post.ID }}" class="custom-card">
+                    <div class="card positon-relative card-c">
+                        <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                            <h5 class="card-title">{{$post.Title}}</h5>
+                            <p class="card-text text-truncate">{{ $post.Body }}</p>
+                            <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ $post.Comment_Nb}} - ❤️ {{ $post.Likes}} -  <img src="{{ .User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
+                        </div>
+                    </div>
+                </a>
             </div>
-          </div>
+        </div>
+        {{ end }}
           <div class="col">
             <div class="card">
               <div class="card-body">
@@ -155,7 +163,7 @@
           </div>
         </div>
     </div>
-    <div class="col-sm-4 border">
+    <div class="col-sm-4">
       <h4>Dernier Post</h4>
       <div class="card">
         <div class="card-body">
@@ -176,6 +184,7 @@
         </div>
         
       </div>
+      <br>
       <h4>Dernier Commentaire</h4>
       <div class="card">
         <div class="card-body">
@@ -184,7 +193,9 @@
         </div>
       </div>
     </div>
+  </div>
 </div>
+
 <script src="../assets/main.js"></script>
 
 

@@ -84,11 +84,14 @@ func CheckSession(r *http.Request) (bool, int) {
 
 func GetSession(r *http.Request) INFO {
 	var userinfo INFO
+	color := RandomColor()
 	fmt.Println("Get Session")
 	cExist, idSession := CheckSession(r)
 	if cExist {
+
 		db, err := sql.Open("sqlite3", "database/database.db")
 		CheckErr(err)
+
 		tabusers, err := db.Query("SELECT * FROM Users")
 		if err != nil {
 			fmt.Println(err.Error())
@@ -101,25 +104,84 @@ func GetSession(r *http.Request) INFO {
 		var description string
 		var image string
 		var country string
+
 		var all_Post []POSTINFO
+
 		for tabusers.Next() {
 			err = tabusers.Scan(&id, &username, &email, &since, &description, &password, &image, &country)
 			CheckErr(err)
+
 			if id == idSession {
-				userinfo = INFO{
-					ID:          id,
-					Email:       email,
-					PassWord:    password,
-					UserName:    username,
-					Since:       since,
-					Description: description,
-					Image:       image,
-					Country:     country,
-					Login:       true,
+
+				var postID int
+				var title string
+				var categorie string
+				var body string
+				var userID int
+				var postImage string
+				var likes int
+				var comment_nb int
+				var since string
+
+				post, _ := db.Query("SELECT * from Posts WHERE user_id=" + strconv.Itoa(id))
+				for post.Next() {
+					err = post.Scan(&postID, &title, &categorie, &body, &userID, &postImage, &likes, &comment_nb, &since)
+					if id == userID {
+
+						tabCategories := strings.Split(categorie, ";")
+						var tabCat []CATEGORIES
+						for _, x := range tabCategories {
+							oneCategorie := CATEGORIES{
+								Cat:   x,
+								Color: color[x],
+							}
+							tabCat = append(tabCat, oneCategorie)
+						}
+
+						var post_user_info INFO
+						var post_user_id int
+						var post_user_email string
+						var post_user_password string
+						var post_user_username string
+						var post_user_description string
+						var post_user_since string
+						var post_user_image2 string
+						var post_user_country string
+						user, _ := db.Query("SELECT * FROM Users Where id=" + strconv.Itoa(userID))
+						for user.Next() {
+							err = user.Scan(&post_user_id, &post_user_username, &post_user_email, &post_user_since, &post_user_description, &post_user_password, &post_user_image2, &post_user_country)
+							CheckErr(err)
+							if id == user_id {
+								post_user_info = INFO{
+									ID:          post_user_id,
+									Email:       post_user_email,
+									PassWord:    post_user_password,
+									UserName:    poost_user_username,
+									Since:       post_user_since,
+									Description: post_user_description,
+									Image:       post_user_image2,
+									Country:     post_user_country,
+								}
+								break
+							}
+						}
+						user.Close()
+						post_info := POSTINFO{
+							ID:         postID,
+							User_ID:    id,
+							Title:      title,
+							Body:       body,
+							Image:      postImage,
+							Categories: tabCat,
+							Likes:      likes,
+							Comment_Nb: comment_nb,
+
+							Post_User_Info: post_user_info,
+						}
+
+						all_Post = append(all_Post, post_info)
+					}
 				}
-
-				all_Post = GetPost(userinfo.ID)
-
 				userinfo = INFO{
 					ID:          id,
 					Email:       email,

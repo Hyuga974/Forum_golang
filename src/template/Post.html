@@ -3,11 +3,11 @@
 <div class="border border-secondary container rounded-3 pl-2 pr-2 pb-2 mt-5">
     <!-- CATEGORIE -->
     <div class="dropdown">
-    <i class="fas fa-ellipsis-v mt-1 dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float:right; margin-left: 10px;"></i>
+    <i class="fas fa-ellipsis-v mt-1" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float:right; margin-left: 10px;"></i>
       {{ if .Post_Info.Deletable }}
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <a class="dropdown-item" href="/editpost?id={{ .Post_Info.ID }}" >Modifier le post</a>
-        <a class="dropdown-item" style="color:red" href="#">Supprimer le post</a>
+        <a class="dropdown-item" style="color:red" href="/deletepost?id={{ .Post_Info.ID }}">Supprimer le post</a>
       </div>
       {{ end }}
     </div>
@@ -69,14 +69,14 @@
     <div class="row">
         {{ if .Post_Info.Image }}
         <div class="col-6 mt-3">
-            <span>{{ .Post_Info.Body }}</span>
+            <span style="white-space: pre-line;">{{ .Post_Info.Body }}</span>
         </div>
         <div class="col-6">
             <img src="{{ .Post_Info.Image }}" style="max-width: 100%;height: auto;">
         </div>
         {{ else }}
         <div class="col-9 mt-3">
-            <span>{{ .Post_Info.Body }}</span>
+            <span style="white-space: pre-line;">{{ .Post_Info.Body }}</span>
         </div>{{ end }}
     </div>
 </div>

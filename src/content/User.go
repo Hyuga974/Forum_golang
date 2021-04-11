@@ -94,6 +94,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		confirm := r.FormValue("psw-confirmation")
 		Crypted := []byte(password)
 		Crypted, _ = bcrypt.GenerateFromPassword(Crypted, 10)
+		fmt.Printf("Username : %s ; Email: %s; Country: %s;", username, email, country)
 
 		if username != "" || email != "" || password != "" {
 			if password != confirm {
@@ -107,11 +108,13 @@ func Register(w http.ResponseWriter, r *http.Request) {
 						msg = "Ce nom est déjà utilisé par un autre utilisateur"
 					} else {
 						fmt.Println(err.Error())
+						http.Redirect(w, r, "/login", 301)
 					}
 				}
 			}
+			fmt.Println(msg)
+			fmt.Println(" Compte créé ")
 		}
-		http.Redirect(w, r, "/login", 301)
 	}
 	Info := INFO{
 		Msg: msg,
@@ -173,15 +176,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(id)
 				fmt.Println(email)
 				fmt.Println(Password)
+				fmt.Println(r.FormValue("mail"))
+				if email == r.FormValue("mail") {
+					mailfound = true
+					break
+				}
 			}
 			mdp := r.FormValue("password")
 			fmt.Printf("mdp entré : %s", mdp)
-			if email == r.FormValue("mail") {
-				mailfound = true
-			}
 
 			test.Close()
+			fmt.Printf("Before: mailfound --> %v \n", mailfound)
 			if mailfound {
+				fmt.Print("Into mailfound")
 				fmt.Println(mdp)
 				fmt.Println(Password)
 				cryptedPassword := []byte(Password)
@@ -201,7 +208,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 						Msg:         "Vous êtes connecté en tant que " + username,
 					}
 
-					
 					http.Redirect(w, r, "/", 301)
 				} else {
 					userinfo = INFO{

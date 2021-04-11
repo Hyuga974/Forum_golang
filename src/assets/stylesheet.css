@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Yatra+One&display=swap');
+
 :root {
     --input-padding-x: 1.5rem;
     --input-padding-y: .75rem;
@@ -497,4 +499,14 @@ s .form-signin .btn {
 
 .card-c:hover {
   box-shadow: 3px 5px 5px #999;
+}
+
+/* ------------ Navbar hover --------- */
+
+.nav-link:hover {
+  border-bottom: white 1px solid;
+}
+
+.navbar-brand {
+  font-family: 'Yatra One', cursive;
 }

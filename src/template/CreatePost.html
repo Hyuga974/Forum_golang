@@ -5,7 +5,7 @@
         <div class="container">
             <div class="row">
                 <h6 class="d-flex justify-content-center text-danger">{{.User_Info.Msg}}</h6>
-                <form class="row needs-validation" method="POST" novalidate>
+                <form enctype="multipart/form-data" class="row needs-validation" method="POST" novalidate>
                     <div class="dropdown" style="float: right;">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float: right;">
                             Catégories
@@ -28,7 +28,7 @@
                     <div class="drop-zone w-25" style="float: right;">
                         <span class="drop-zone__prompt">Drop files here or click to upload</span>
                         <!-- <div class="drop-zone__thumb" data-label="myfile.txt"></div> -->
-                        <input type="file" name="myFile" class="drop-zone__input">
+                        <input type="file" name="myFile" id="myFile" class="drop-zone__input">
                     </div>
                     <div class="col-12 mt-3">
                         <a class="btn btn-outline-danger" href="/" style="float: left;">Annuler</a>

@@ -43,9 +43,9 @@ type POSTINFO struct {
 	Comment_Nb    int
 	All_Comments  []COMMENT
 	Since         string
-	
-	Deletable     bool
-	Modifie bool
+
+	Deletable bool
+	Modifie   bool
 
 	Post_User_Info INFO
 }
