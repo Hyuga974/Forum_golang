@@ -151,12 +151,12 @@ func GetSession(r *http.Request) INFO {
 						for user.Next() {
 							err = user.Scan(&post_user_id, &post_user_username, &post_user_email, &post_user_since, &post_user_description, &post_user_password, &post_user_image2, &post_user_country)
 							CheckErr(err)
-							if id == user_id {
+							if id == post_user_id {
 								post_user_info = INFO{
 									ID:          post_user_id,
 									Email:       post_user_email,
 									PassWord:    post_user_password,
-									UserName:    poost_user_username,
+									UserName:    post_user_username,
 									Since:       post_user_since,
 									Description: post_user_description,
 									Image:       post_user_image2,
@@ -182,6 +182,7 @@ func GetSession(r *http.Request) INFO {
 						all_Post = append(all_Post, post_info)
 					}
 				}
+				post.Close()
 				userinfo = INFO{
 					ID:          id,
 					Email:       email,
@@ -201,6 +202,48 @@ func GetSession(r *http.Request) INFO {
 		db.Close()
 	}
 	fmt.Println("Get session finit")
+	return userinfo
+}
+
+func GetUser(id int) INFO {
+	db, err := sql.Open("sqlite3", "database/database.db")
+
+	tabusers, err := db.Query("SELECT * FROM Users")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	var userinfo INFO
+	var userAllPost []POSTINFO
+	var userID int
+	var username string
+	var image string
+	var email string
+	var description string
+	var password string
+	var country string
+	var since string
+	for tabusers.Next() {
+		err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
+		CheckErr(err)
+		if userID == id {
+			userAllPost = GetPost(userID)
+			userinfo = INFO{
+				ID:          userID,
+				Email:       email,
+				PassWord:    password,
+				UserName:    username,
+				Since:       since,
+				Description: description,
+				Image:       image,
+				Country:     country,
+				AllPosts:    userAllPost,
+			}
+			break
+		}
+	}
+	tabusers.Close()
+	db.Close()
+
 	return userinfo
 }
 
@@ -232,16 +275,18 @@ func GetPost(user_id int) []POSTINFO {
 			}
 			tabCategories = append(tabCategories, catephemere)
 		}
+		user_info := GetUser(user_id)
 		post_info := POSTINFO{
-			ID:         idInt,
-			User_ID:    user_id,
-			Title:      title,
-			Body:       body,
-			Image:      image,
-			Categories: tabCategories,
-			Likes:      likes,
-			Comment_Nb: comment_nb,
-			Since:      since,
+			ID:             idInt,
+			User_ID:        user_id,
+			Title:          title,
+			Body:           body,
+			Image:          image,
+			Categories:     tabCategories,
+			Likes:          likes,
+			Comment_Nb:     comment_nb,
+			Since:          since,
+			Post_User_Info: user_info,
 		}
 		all_Post = append(all_Post, post_info)
 	}

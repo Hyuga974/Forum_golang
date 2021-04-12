@@ -591,37 +591,8 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 				Body:    bodyComment,
 			}
 
-			userComment, err := db.Query("SELECT * FROM Users WHERE id=" + strconv.Itoa(user_id))
-			if err != nil {
-				fmt.Println(err.Error())
-			}
+			user_comment := GetUser(user_id)
 
-			var user_comment INFO
-			var id int
-			var email string
-			var password string
-			var username string
-			var description string
-			var image2 string
-			var country string
-			for userComment.Next() {
-				err = userComment.Scan(&id, &username, &email, &since, &description, &password, &image2, &country)
-				CheckErr(err)
-				if id == user_id {
-					user_comment = INFO{
-						ID:          id,
-						Email:       email,
-						PassWord:    password,
-						UserName:    username,
-						Since:       since,
-						Description: description,
-						Image:       image2,
-						Country:     country,
-					}
-					break
-				}
-			}
-			userComment.Close()
 			oneComment = COMMENT{
 				ID:        comment_id,
 				User_ID:   user_id,
@@ -691,36 +662,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 
 	//Recupération des user_info du user qui a posté
 	fmt.Println("Recupération des user_info du user qui a posté")
-	user, err := db.Query("SELECT * FROM Users WHERE id=" + strconv.Itoa(user_id))
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	var post_user_info INFO
-	var email string
-	var password string
-	var username string
-	var description string
-	var image2 string
-	var country string
-	for user.Next() {
-		err = user.Scan(&id, &username, &email, &since, &description, &password, &image2, &country)
-		CheckErr(err)
-		if id == user_id {
-			post_user_info = INFO{
-				ID:          id,
-				Email:       email,
-				PassWord:    password,
-				UserName:    username,
-				Since:       since,
-				Description: description,
-				Image:       image2,
-				Country:     country,
-			}
-			break
-		}
-	}
-	user.Close()
+	post_user_info := GetUser(user_id)
 
 	if post_user_info.ID == userInfo.ID {
 		deletable = true
