@@ -663,6 +663,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	//Recupération des user_info du user qui a posté
 	fmt.Println("Recupération des user_info du user qui a posté")
 	post_user_info := GetUser(user_id)
+	fmt.Println("ici")
 
 	if post_user_info.ID == userInfo.ID {
 		deletable = true
@@ -686,7 +687,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		Post_Info:           post_info,
 		Currently_Post_Like: likeNow,
 	}
-
+	fmt.Println("J'exécute la page")
 	defer db.Close()
 
 	var files []string
@@ -771,7 +772,17 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 			err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
 			CheckErr(err)
 			if userID == user_id {
-				userAllPost = GetPost(userID)
+				userinfo = INFO{
+					ID:          userID,
+					Email:       email,
+					PassWord:    password,
+					UserName:    username,
+					Since:       since,
+					Description: description,
+					Image:       image,
+					Country:     country,
+				}
+				userAllPost = GetPost(userinfo)
 				userinfo = INFO{
 					ID:          userID,
 					Email:       email,

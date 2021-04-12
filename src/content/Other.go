@@ -206,12 +206,17 @@ func GetSession(r *http.Request) INFO {
 }
 
 func GetUser(id int) INFO {
+	fmt.Println("Récupération des info du user ", strconv.Itoa(id))
 	db, err := sql.Open("sqlite3", "database/database.db")
-
-	tabusers, err := db.Query("SELECT * FROM Users")
+	fmt.Println(db)
+	if err != nil {
+		fmt.Print(err)
+	}
+	tabusers, err := db.Query("SELECT * FROM Users where id=" + strconv.Itoa(id))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+	fmt.Println("Déclaration")
 	var userinfo INFO
 	var userAllPost []POSTINFO
 	var userID int
@@ -222,13 +227,24 @@ func GetUser(id int) INFO {
 	var password string
 	var country string
 	var since string
+	fmt.Println("Fin déclaration")
 	for tabusers.Next() {
 		err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
 		CheckErr(err)
 		if userID == id {
-			userAllPost = GetPost(userID)
 			userinfo = INFO{
-				ID:          userID,
+				ID:          id,
+				Email:       email,
+				PassWord:    password,
+				UserName:    username,
+				Since:       since,
+				Description: description,
+				Image:       image,
+				Country:     country,
+			}
+			userAllPost = GetPost(userinfo)
+			userinfo = INFO{
+				ID:          id,
 				Email:       email,
 				PassWord:    password,
 				UserName:    username,
@@ -241,20 +257,23 @@ func GetUser(id int) INFO {
 			break
 		}
 	}
+	fmt.Println("Fin de Scan")
 	tabusers.Close()
 	db.Close()
 
+	fmt.Println("Récupération des info du user ", strconv.Itoa(id), "terminée")
 	return userinfo
 }
 
-func GetPost(user_id int) []POSTINFO {
+func GetPost(user INFO) []POSTINFO {
 	var all_Post []POSTINFO
 	db, err := sql.Open("sqlite3", "database/database.db")
 
-	post, err := db.Query("SELECT * FROM Posts WHERE user_id=" + strconv.Itoa(user_id) + " ORDER BY id DESC")
+	post, err := db.Query("SELECT * FROM Posts WHERE user_id=" + strconv.Itoa(user.ID) + " ORDER BY id DESC")
 
 	color := RandomColor()
 	var since string
+	var user_id int
 	var id string
 	var title string
 	var body string
@@ -275,7 +294,6 @@ func GetPost(user_id int) []POSTINFO {
 			}
 			tabCategories = append(tabCategories, catephemere)
 		}
-		user_info := GetUser(user_id)
 		post_info := POSTINFO{
 			ID:             idInt,
 			User_ID:        user_id,
@@ -286,7 +304,7 @@ func GetPost(user_id int) []POSTINFO {
 			Likes:          likes,
 			Comment_Nb:     comment_nb,
 			Since:          since,
-			Post_User_Info: user_info,
+			Post_User_Info: user,
 		}
 		all_Post = append(all_Post, post_info)
 	}

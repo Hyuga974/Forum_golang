@@ -82,7 +82,17 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 			err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
 			content.CheckErr(err)
 			if userID == user_id {
-				userAllPost = content.GetPost(userID)
+				userinfo = content.INFO{
+					ID:          userID,
+					Email:       email,
+					PassWord:    password,
+					UserName:    username,
+					Since:       since,
+					Description: description,
+					Image:       image,
+					Country:     country,
+				}
+				userAllPost = content.GetPost(user)
 				userinfo = content.INFO{
 					ID:          userID,
 					Email:       email,
@@ -149,7 +159,17 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 			err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
 			content.CheckErr(err)
 			if userID == user_id {
-				userAllPost = content.GetPost(userID)
+				userinfo = content.INFO{
+					ID:          userID,
+					Email:       email,
+					PassWord:    password,
+					UserName:    username,
+					Since:       since,
+					Description: description,
+					Image:       image,
+					Country:     country,
+				}
+				userAllPost = content.GetPost(user)
 				userinfo = content.INFO{
 					ID:          userID,
 					Email:       email,
