@@ -23,10 +23,8 @@ func Delete(w http.ResponseWriter, r *http.Request, id int) {
 	res, err := stmt.Exec(id)
 	CheckErr(err)
 
-	affect, err := res.RowsAffected()
+	_, err = res.RowsAffected()
 	CheckErr(err)
-
-	fmt.Println(affect)
 
 	db.Close()
 
@@ -201,14 +199,12 @@ func GetSession(r *http.Request) INFO {
 		tabusers.Close()
 		db.Close()
 	}
-	fmt.Println("Get session finit")
 	return userinfo
 }
 
 func GetUser(id int) INFO {
 	fmt.Println("Récupération des info du user ", strconv.Itoa(id))
 	db, err := sql.Open("sqlite3", "database/database.db")
-	fmt.Println(db)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -216,7 +212,6 @@ func GetUser(id int) INFO {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println("Déclaration")
 	var userinfo INFO
 	var userAllPost []POSTINFO
 	var userID int
@@ -227,7 +222,6 @@ func GetUser(id int) INFO {
 	var password string
 	var country string
 	var since string
-	fmt.Println("Fin déclaration")
 	for tabusers.Next() {
 		err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
 		CheckErr(err)
@@ -259,11 +253,8 @@ func GetUser(id int) INFO {
 		Country:     country,
 		AllPosts:    userAllPost,
 	}
-	fmt.Println("Fin de Scan")
 	tabusers.Close()
 	db.Close()
-
-	fmt.Println("Récupération des info du user ", strconv.Itoa(id), "terminée")
 	return userinfo
 }
 

@@ -1,21 +1,64 @@
 {{ template "main" . }} {{ define "body" }}
+<script>
+    var myModal = document.getElementById('myModal')
+    var myInput = document.getElementById('myInput')
+
+    myModal.addEventListener('shown.bs.modal', function() {
+        myInput.focus()
+    })
+</script>
+
+
 <form method="POST" class="needs-validation" novalidate>
-<div class="border border-secondary container rounded-3 pl-2 pr-2 pb-2 mt-5">
-    <!-- CATEGORIE -->
-    <div class="dropdown">
-    <i class="fas fa-ellipsis-v mt-1" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float:right; margin-left: 10px;"></i>
-      {{ if .Post_Info.Deletable }}
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="/editpost?id={{ .Post_Info.ID }}" >Modifier le post</a>
-        <a class="dropdown-item" style="color:red" href="/deletepost?id={{ .Post_Info.ID }}">Supprimer le post</a>
-      </div>
-      {{ end }}
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Signaler</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-form-label" for="inputDefault">Title:</label>
+                        <input type="text" class="form-control" name="SignalTitle" placeholder="Bah faut écrire ici enculé" id="inputDefault">
+                    </div>
+                    <form>
+                        <div class="mb-3">
+                            <label for="message-text" class="col-form-label">User:</label>
+                            <input class="form-control" name="SignalUser" placeholder="Qui a écrit ce post" id="message-text">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="message-text" class="col-form-label">Autre Chose ?</label>
+                            <textarea class="form-control" name="SignalOther" id="message-text"></textarea>
+                        </div>
+                    </form>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <p style="float:right">{{ .Post_Info.Post_User_Info.UserName }}</p>
-    <img src="{{ .Post_Info.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:25px;width:25px;">
-    <p style="float:right"> <input name="Liker" type="checkbox" id="checkbox" {{ .Currently_Post_Like }} onchange="submit()" />
-      <label for="checkbox">
+
+
+    <div class="border border-secondary container rounded-3 pl-2 pr-2 pb-2 mt-5">
+        <!-- CATEGORIE -->
+        <div class="dropdown">
+            <i class="fas fa-ellipsis-v mt-1" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float:right; margin-left: 10px;"></i>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">{{ if .Post_Info.Deletable }}
+                <a class="dropdown-item" href="/editpost?id={{ .Post_Info.ID }}">Modifier le post</a>
+                <a class="dropdown-item" style="color:red" href="/deletepost?id={{ .Post_Info.ID }}">Supprimer le post</a>
+                <hr class="dropdown-divider"> {{ end }}
+                <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal">Signaler</a>
+            </div>
+        </div>
+
+        <p style="float:right">{{ .Post_Info.Post_User_Info.UserName }}</p>
+        <img src="{{ .Post_Info.Post_User_Info.Image }}" class="mx-1 mt-1" style="float:right;border-radius: 100%;height:25px;width:25px;">
+        <p style="float:right"> <input name="Liker" type="checkbox" id="checkbox" {{ .Currently_Post_Like }} onchange="submit()" />
+            <label for="checkbox">
         
         <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
           <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
@@ -59,31 +102,30 @@
           </g>
         </svg>
       </label> {{ .Post_Info.Likes}} | </p>
-    <h1>{{ .Post_Info.Title }}
-        <h6>
-            {{ range $cat := .Post_Info.Categories}}
-              <span class="badge rounded-pill" style="background-color:{{ $cat.Color }};">{{ $cat.Cat }}</span>
-            {{ end }}
-        </h6>
-    </h1>
-    <div class="row">
-        {{ if .Post_Info.Image }}
-        <div class="col-6 mt-3">
-            <span style="white-space: pre-line;">{{ .Post_Info.Body }}</span>
+        <h1>{{ .Post_Info.Title }}
+            <h6>
+                {{ range $cat := .Post_Info.Categories}}
+                <span class="badge rounded-pill" style="background-color:{{ $cat.Color }};">{{ $cat.Cat }}</span> {{ end }}
+            </h6>
+        </h1>
+        <div class="row">
+            {{ if .Post_Info.Image }}
+            <div class="col-6 mt-3">
+                <span style="white-space: pre-line;">{{ .Post_Info.Body }}</span>
+            </div>
+            <div class="col-6">
+                <img src="{{ .Post_Info.Image }}" style="max-width: 100%;height: auto;">
+            </div>
+            {{ else }}
+            <div class="col-9 mt-3">
+                <span style="white-space: pre-line;">{{ .Post_Info.Body }}</span>
+            </div>{{ end }}
         </div>
-        <div class="col-6">
-            <img src="{{ .Post_Info.Image }}" style="max-width: 100%;height: auto;">
-        </div>
-        {{ else }}
-        <div class="col-9 mt-3">
-            <span style="white-space: pre-line;">{{ .Post_Info.Body }}</span>
-        </div>{{ end }}
     </div>
-</div>
-<br>
+    <br>
     <div class="container">
-        <input type="text" name="comment" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;" required> 
-          <button class="btn btn-outline-secondary">
+        <input type="text" name="comment" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;" required>
+        <button class="btn btn-outline-secondary">
             <i class="fas fa-paper-plane">
             </i>
             Commenter
@@ -99,31 +141,37 @@
             <div class="text mt-3">
                 <h6 class="float-start">{{ $comment.Body }}</h6>
                 <p class="float-end"> {{ $comment.User_Info.UserName}} </p>
-                <img src="{{ $comment.User_Info.Image}}" style="float:right;border-radius: 100%;height:25px;width:25px;">
+                <img src="{{ $comment.User_Info.Image}}" class="mx-1" style="float:right;border-radius: 100%;height:25px;width:25px;">
             </div>
         </div>
     </div>
     {{ end }}
 </div>
 <script>
-    {{/* (function() {
-        'use strict'
+    {
+        {
+            /* (function() {
+                    'use strict'
 
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        var forms = document.querySelectorAll('.needs-validation:not(.passwd)')
+                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                    var forms = document.querySelectorAll('.needs-validation:not(.passwd)')
 
-        // Loop over them and prevent submission
-        Array.prototype.slice.call(forms)
-            .forEach(function(form) {
-                form.addEventListener('submit', function(event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
+                    // Loop over them and prevent submission
+                    Array.prototype.slice.call(forms)
+                        .forEach(function(form) {
+                            form.addEventListener('submit', function(event) {
+                                if (!form.checkValidity()) {
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                }
 
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })() */}}
+                                form.classList.add('was-validated')
+                            }, false)
+                        })
+                })() */
+        }
+    }
 </script>
+
+<script src="../assets/main.js"></script>
 {{ end }}

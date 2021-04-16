@@ -3,165 +3,12 @@ package content
 import (
 	"database/sql"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
 	"time"
 )
-
-func CreationPost(w http.ResponseWriter, r *http.Request) {
-	user := GetSession(r)
-
-	if user.UserName != "" {
-		r.ParseMultipartForm(10 << 20) //max size 10Mb (5mb for the pf)
-		var Post POSTINFO
-		var tabCat []CATEGORIES
-
-		color := RandomColor()
-
-		//sport, anime/manga, economie, jeux vidéo, informatique, voyages, NEW, paranormal.
-		allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
-		tabCategories := strings.Split(allCategories, ";")
-
-		db, err := sql.Open("sqlite3", "database/database.db")
-		CheckErr(err)
-
-		if r.Method == "POST" {
-			fmt.Println("ici")
-			datab, err := db.Prepare("INSERT INTO Posts (title, categories, body, user_id, image, likes, comment_nb, since) VALUES (?,?,?,?,?,?,?, ?)")
-			if err != nil {
-				fmt.Println(err)
-				http.Error(w, "Server Error", 500)
-			}
-			title := r.FormValue("title")
-			body := r.FormValue("body")
-			var image string
-			file, handler, err := r.FormFile("myFile")
-			if err != nil {
-				image = r.FormValue("myFile")
-				fmt.Println(err)
-			} else {
-				defer file.Close()
-				fmt.Printf("Uploaded File: %+v\n", strings.ReplaceAll(handler.Filename, " ", "-"))
-				fmt.Printf("File Size: %+v\n", handler.Size)
-				fmt.Printf("MIME Header: %+v\n", handler.Header)
-
-				absPath, _ := filepath.Abs("../src/assets/posts/" + strings.ReplaceAll(handler.Filename, " ", "-"))
-
-				resFile, err := os.Create(absPath)
-				if err != nil {
-					fmt.Print(w, err)
-				}
-				defer resFile.Close()
-
-				io.Copy(resFile, file)
-				defer resFile.Close()
-				fmt.Print("File uploaded")
-
-				image = "../assets/posts/" + strings.ReplaceAll(handler.Filename, " ", "-")
-			}
-
-			likes := 0
-			comment_nb := 0
-			loc, _ := time.LoadLocation("Europe/Paris")
-			pretime := time.Now().In(loc)
-			since := pretime.String()[:19]
-			var categoriesCheck string
-			for _, categorie := range tabCategories {
-				if r.FormValue(categorie) != "" {
-					categoriesCheck += categorie + ";"
-				}
-			}
-
-			if title != "" && body != "" && categoriesCheck != "" {
-				user_id := user.ID
-				var tabAllCat []CATEGORIES
-
-				_, err := datab.Exec(title, categoriesCheck, body, user_id, image, likes, comment_nb, since)
-				if err != nil {
-					fmt.Println(err.Error())
-				}
-
-				tabCategoriesCheck := strings.Split(categoriesCheck, ";")
-				for _, x := range tabCategoriesCheck {
-					oneCategorie := CATEGORIES{
-						Cat:   x,
-						Color: color[x],
-					}
-					tabCat = append(tabCat, oneCategorie)
-				}
-				for _, x := range tabCategories {
-					oneCategorie := CATEGORIES{
-						Cat:   x,
-						Color: color[x],
-					}
-					tabAllCat = append(tabAllCat, oneCategorie)
-				}
-				Post = POSTINFO{
-					User_ID:       user.ID,
-					Title:         title,
-					Body:          body,
-					Image:         image,
-					Categories:    tabCat,
-					Since:         since,
-					AllCategories: tabAllCat,
-				}
-
-				uId := strconv.Itoa(user.ID)
-
-				newPost, err := db.Query("SELECT * FROM Posts WHERE user_id=" + uId + " ORDER BY id DESC LIMIT 1")
-				fmt.Println(newPost)
-				if err != nil {
-					fmt.Println(err.Error())
-				}
-				var id string
-				var categories string
-				for newPost.Next() {
-					err = newPost.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
-					CheckErr(err)
-				}
-				newPost.Close()
-
-				http.Redirect(w, r, "/post?id="+id, 301)
-			}
-		} else {
-			for _, x := range tabCategories {
-				oneCategorie := CATEGORIES{
-					Cat:   x,
-					Color: color[x],
-				}
-				tabCat = append(tabCat, oneCategorie)
-			}
-			Post = POSTINFO{
-				Categories: tabCat,
-			}
-		}
-		data := ALLINFO{
-			User_Info: user,
-			Post_Info: Post,
-		}
-
-		files := []string{"template/CreatePost.html", "template/Common.html"}
-		tmp, err := template.ParseFiles(files...)
-		if err != nil {
-			fmt.Println(err)
-			http.Error(w, "Server Error: Check template", 500)
-		}
-
-		err = tmp.Execute(w, data)
-		if err != nil {
-			fmt.Println(err)
-			http.Error(w, "Server Error", 500)
-		}
-	} else {
-		fmt.Println("LA")
-		http.Redirect(w, r, "/login", 301)
-	}
-}
 
 func EditPost(w http.ResponseWriter, r *http.Request) {
 	user := GetSession(r)
@@ -236,13 +83,11 @@ func EditPost(w http.ResponseWriter, r *http.Request) {
 			Likes:         likes,
 			Comment_Nb:    comments_nb,
 		}
-		fmt.Println(post_info.Categories)
 
 		if user.ID == post_info.User_ID {
 			var tabCat []CATEGORIES
 
 			if r.Method == "POST" {
-				fmt.Println("Modification d'un Post en cours")
 
 				//Récupération des nouvelles entrés
 				newTitle := r.FormValue("title")
@@ -325,7 +170,6 @@ func EditPost(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	} else {
-		fmt.Println("LA")
 		http.Redirect(w, r, "/login", 301)
 	}
 }
@@ -334,7 +178,6 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 	user := GetSession(r)
 
 	postID := r.FormValue("id")
-	fmt.Println("Post id :" + postID)
 	if user.UserName != "" {
 		var post_id int
 		var title string
@@ -371,17 +214,14 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if user.ID == post_info.User_ID {
-			fmt.Println("Supresion d'un Post en cours")
 
 			del, _ := db.Prepare("DELETE from Posts WHERE id=?")
 
 			res, err := del.Exec(strconv.Itoa(post_info.ID))
 			CheckErr(err)
 
-			affect, err := res.RowsAffected()
+			_, err = res.RowsAffected()
 			CheckErr(err)
-
-			fmt.Println(affect)
 
 			del.Close()
 			http.Redirect(w, r, "/posts", 301)
@@ -404,7 +244,6 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	} else {
-		fmt.Println("LA")
 		http.Redirect(w, r, "/login", 301)
 	}
 }
@@ -460,25 +299,18 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 					http.Error(w, "Server Error", 500)
 				}
 
-				fmt.Println(comment)
 				user_id := userInfo.ID
-				fmt.Println(user_id)
 				post_id := upost_id
-				fmt.Println(upost_id)
-				fmt.Println("ICI")
 				loc, _ := time.LoadLocation("Europe/Paris")
 				pretime := time.Now().In(loc)
 				since := pretime.String()[:19]
-				result, err := datab.Exec(comment, user_id, post_id, since)
-				fmt.Println(result)
+				_, err = datab.Exec(comment, user_id, post_id, since)
 				if err != nil {
 					fmt.Println(err)
-					fmt.Println("Une erreur ici")
 				}
 				datab.Close()
 			} else {
 				if r.FormValue("Suppr") != "" {
-					fmt.Printf("Post id : %s", post_id)
 					upost_id, err := strconv.Atoi(post_id)
 					if userInfo.ID == upost_id {
 
@@ -490,10 +322,8 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 						res, err := stmt.Exec(userInfo.ID, upost_id)
 						CheckErr(err)
 
-						affect, err := res.RowsAffected()
+						_, err = res.RowsAffected()
 						CheckErr(err)
-
-						fmt.Println(affect)
 
 						stmt.Close()
 					} else {
@@ -501,7 +331,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 					}
 				} else {
 					if !dejaLike {
-						fmt.Println("je suis dans le if")
 
 						loc, _ := time.LoadLocation("Europe/Paris")
 						pretime := time.Now().In(loc)
@@ -516,10 +345,8 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 						_, err = datab.Exec(user_id, post_id, since)
 						if err != nil {
 							fmt.Println(err)
-							fmt.Println("Une erreur ici")
 						}
 						datab.Close()
-						fmt.Println("Tu viens de like ce post")
 
 						dataPost, err := db.Query("SELECT * FROM Posts WHERE id=" + strconv.Itoa(post_id))
 						if err != nil {
@@ -550,21 +377,16 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 						res, err := stmt.Exec(userInfo.ID, upost_id)
 						CheckErr(err)
 
-						affect, err := res.RowsAffected()
+						_, err = res.RowsAffected()
 						CheckErr(err)
 
-						fmt.Println(affect)
-
 						stmt.Close()
-
-						fmt.Println("Tu viens de unlike ce post")
 
 						likeNow = ""
 					}
 				}
 			}
 		} else {
-			fmt.Println("LA")
 			http.Redirect(w, r, "/login", 301)
 		}
 		db.Close()
@@ -572,8 +394,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 
 	db, _ = sql.Open("sqlite3", "database/database.db")
 	//récupération de tout les commentaires liés au post
-	fmt.Println("récupération de tout les commentaires liés au post")
-
 	var title string
 	var body string
 	var image string
@@ -648,7 +468,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	datab.Close()
 
 	//récupération du post
-	fmt.Println("récupération du post")
 	test, err := db.Query("SELECT * FROM Posts WHERE id=" + post_id)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -658,7 +477,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		CheckErr(err)
 	}
 	test.Close()
-	fmt.Println(body)
 
 	tabCategories := strings.Split(categories, ";")
 	var tabCat []CATEGORIES
@@ -671,10 +489,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Recupération des user_info du user qui a posté
-	fmt.Println("Recupération des user_info du user qui a posté")
 	post_user_info := GetUser(user_id)
-	fmt.Println("ici")
-
 	if post_user_info.ID == userInfo.ID {
 		deletable = true
 	}
@@ -697,7 +512,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		Post_Info:           post_info,
 		Currently_Post_Like: likeNow,
 	}
-	fmt.Println("J'exécute la page")
 	defer db.Close()
 
 	var files []string
@@ -706,169 +520,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	} else {
 		files = []string{"template/404.html"}
 	}
-
-	tmp, err := template.ParseFiles(files...)
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Server Error: Check template", 500)
-	}
-
-	err = tmp.Execute(w, data)
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Server Error", 500)
-	}
-}
-
-// AllPosts : kzdnzndz
-func AllPosts(w http.ResponseWriter, r *http.Request) {
-	user := GetSession(r)
-	color := RandomColor()
-
-	allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
-	tabCategories := strings.Split(allCategories, ";")
-	var tabCat []CATEGORIES
-	for _, x := range tabCategories {
-		oneCategorie := CATEGORIES{
-			Cat:   x,
-			Color: color[x],
-		}
-		tabCat = append(tabCat, oneCategorie)
-	}
-
-	var all_Post []POSTINFO
-	var post_info POSTINFO
-
-	db, err := sql.Open("sqlite3", "database/database.db")
-
-	post, err := db.Query("SELECT * FROM Posts ORDER BY id DESC")
-
-	var since string
-	var id string
-	var user_id int
-	var title string
-	var body string
-	var image string
-	var likes int
-	var comment_nb int
-	var categories string
-	for post.Next() {
-		err = post.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
-		CheckErr(err)
-		idInt, _ := strconv.Atoi(id)
-		cat := strings.Split(categories, ";")
-		var tabCategories []CATEGORIES
-		for _, x := range cat {
-			catephemere := CATEGORIES{
-				Cat:   x,
-				Color: color[x],
-			}
-			tabCategories = append(tabCategories, catephemere)
-		}
-
-		tabusers, err := db.Query("SELECT * FROM Users")
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		var userinfo INFO
-		var userAllPost []POSTINFO
-		var userID int
-		var username string
-		var email string
-		var description string
-		var password string
-		var country string
-		for tabusers.Next() {
-			err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
-			CheckErr(err)
-			if userID == user_id {
-				userinfo = INFO{
-					ID:          userID,
-					Email:       email,
-					PassWord:    password,
-					UserName:    username,
-					Since:       since,
-					Description: description,
-					Image:       image,
-					Country:     country,
-				}
-				userAllPost = GetPost(userinfo)
-				userinfo = INFO{
-					ID:          userID,
-					Email:       email,
-					PassWord:    password,
-					UserName:    username,
-					Since:       since,
-					Description: description,
-					Image:       image,
-					Country:     country,
-					AllPosts:    userAllPost,
-				}
-				break
-			}
-		}
-		tabusers.Close()
-
-		post_info = POSTINFO{
-			ID:         idInt,
-			User_ID:    user_id,
-			Title:      title,
-			Body:       body,
-			Image:      image,
-			Categories: tabCategories,
-			Likes:      likes,
-			Comment_Nb: comment_nb,
-
-			Post_User_Info: userinfo,
-		}
-		all_Post = append(all_Post, post_info)
-	}
-	post.Close()
-
-	var allUsers []INFO
-
-	users, err := db.Query("SELECT * FROM Users ORDER BY id DESC")
-	var currentlyUser INFO
-	var email string
-	var password string
-	var username string
-	var description string
-	var country string
-
-	for users.Next() {
-		err = users.Scan(&id, &username, &email, &since, &description, &password, &image, &country)
-		CheckErr(err)
-
-		idInt, _ := strconv.Atoi(id)
-		currentlyUser = INFO{
-			ID:          idInt,
-			Email:       email,
-			PassWord:    password,
-			UserName:    username,
-			Since:       since,
-			Description: description,
-			Image:       image,
-			Country:     country,
-		}
-		allUsers = append(allUsers, currentlyUser)
-	}
-	users.Close()
-
-	db.Close()
-
-	postInfo := POSTINFO{
-		AllCategories: tabCat,
-	}
-
-	data := ALLINFO{
-		User_Info: user,
-		Post_Info: postInfo,
-
-		All_User:  allUsers,
-		All_Posts: all_Post,
-	}
-
-	files := []string{"template/Posts.html", "template/Common.html"}
 
 	tmp, err := template.ParseFiles(files...)
 	if err != nil {
