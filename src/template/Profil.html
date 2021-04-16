@@ -56,37 +56,8 @@
         </div>
   </form>
 <div class="container-fluid">
-  <div class="row py-10 px-7">
-    <div class="col-sm-2 mx-auto align-self-center">
-        <!-- Profile widget -->
-        <!-- <div class="bg-white shadow rounded overflow-hidden" style="float: left;">
-            <div class="px-4 pt-0 pb-4 cover">
-                <div class="media align-items-end profile-head">
-                    <div class="profile mr-3"><img src="" alt="..." width="130" class="rounded mb-2 img-thumbnail">
-                        <a href="#" class="btn btn-outline-white btn-sm btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit Profile</a></div>
-                    <div class="media-body mb-5 text-white">
-                        <h4 class="mt-0 mb-0">{{ .User_Info.UserName }}</h4>
-                        <p class="small mb-4"> <i class="fas fa-map-marker-alt mr-2"></i>{{ .User_Info.Country }}</p>
-                    </div>d
-                </div>
-            </div>
-            <div class="bg-light p-4 d-flex justify-content-end text-center">
-                <ul class="list-inline mb-0">
-                    <li class="list-inline-item">
-                        <h5 class="font-weight-bold mb-0 d-block">0</h5><small class="text-muted"> <i class="fas fa-image mr-1"></i>Posts</small>
-                    </li>
-  
-                </ul>
-            </div>
-            <div class="px-4 py-3">
-                <h5 class="mb-0">About</h5>
-                <div class="p-4 rounded shadow-sm bg-light">
-                    <p class="font-italic mb-0">Golang Developer</p>
-                    <p class="font-italic mb-0">Lives in Bordeaux</p>
-                    <p class="font-italic mb-0">Costa a plein temps</p>
-                </div>
-            </div>
-        </div> -->
+  <div class="row py-10 px-7 border">
+    <div class="col-sm-2 border mx-auto align-self-center">
         <div class="card" style="width: 18rem; float: left;">
             <img src="{{ .User_Info.Image }}" class="card-img-top" alt="...">
             <div class="card-body">
@@ -95,36 +66,12 @@
               <a href="#" class="btn btn-outline-white btn-sm btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit Profile</a>
             </div>
         </div>
-      </div>
-      <div class="col-sm-5 mx-auto align-self-center">
-        <!-- <div class="py-4 px-4" style="float: right;">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h5 class="mb-0">Recent Post</h5><a href="#" class="btn btn-link text-muted">Show all</a>
-                {{ range $post := .User_Info.AllPosts}}
-                  <li class="list-inline-item">
-                        {{ $post.Title }}
-
-                        <div class="row">
-                        {{ if $post.Image }}
-                        <div class="col-6 mt-3 text-truncate" style="max-width: 150px;">
-                            <span>{{ $post.Body }}</span>
-                        </div>
-                        <div class="col-6">
-                            <img src="{{ $post.Image }}" style="max-width: 100%;height: auto;">
-                        </div>
-                        {{ else }}
-                        <div class="col-9 mt-3 text-truncate" style="max-width: 150px;">
-                            <span>{{ $post.Body }}</span>
-                        </div>{{ end }}
-                      </div>
-                    </li>
-                {{ end }}
-            </div>
-        </div> -->
+    </div>
+    <div class="col-sm-5 border mx-auto align-self-center">
         <div class="row row-cols-1 g-4">
+            <div class="bg-light" style="overflow-y:scroll; height:400px;">
           {{ range $post := .User_Info.AllPosts }}
         <div class="col">
-            <div class="bg-light">
                 <a href="/post?id={{ $post.ID }}" class="custom-card">
                     <div class="card positon-relative card-c">
                         <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
@@ -134,40 +81,45 @@
                         </div>
                     </div>
                 </a>
-            </div>
+            
         </div>
         {{ end }}
-
-    </div>
-    <div class="col-sm-4">
-      <h4>Dernier Post</h4>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Card title</h5>
-          <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
         </div>
-      </div>
+        </div>
+    </div>
+    <div class="col-sm-4 border">
+      <h4>Dernier Post</h4>
+      <a href="/post?id={{ .Last_Post.ID }}" class="custom-card">
+          <div class="card positon-relative card-c">
+              <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                  <h5 class="card-title">{{ .Last_Post.Title}}</h5>
+                  <p class="card-text text-truncate">{{ .Last_Post.Body }}</p>
+                  <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ .Last_Post.Comment_Nb}} - ❤️ {{ .Last_Post.Likes}} -  <img src="{{ .Last_Post.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
+              </div>
+          </div>
+      </a>
       <br>
       <h4>Dernier Like</h4>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Card title</h5>
-          <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <button type="button" class="btn btn-danger">
-            <i class="far fa-heart"></i>
-            Like
-          </button>
-        </div>
-        
-      </div>
+        <a href="/post?id={{ .Last_Like.ID }}" class="custom-card">
+          <div class="card positon-relative card-c">
+              <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                  <h5 class="card-title">{{ .Last_Like.Title}}</h5>
+                  <p class="card-text text-truncate">{{ .Last_Like.Body }}</p>
+                  <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ .Last_Like.Comment_Nb}} - ❤️ {{ .Last_Like.Likes}} -  <img src="{{ .Last_Like.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
+              </div>
+          </div>
+      </a>
       <br>
       <h4>Dernier Commentaire</h4>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Card title</h5>
-          <p class="card-text text-truncate" style="max-width: 150px;">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-        </div>
-      </div>
+        <a href="/post?id={{ .Last_Comment.ID }}" class="custom-card">
+          <div class="card positon-relative card-c">
+              <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                  <h5 class="card-title">{{ .Last_Comment.Title}}</h5>
+                  <p class="card-text text-truncate">{{ .Last_Comment.Body }}</p>
+                  <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ .Last_Comment.Comment_Nb}} - ❤️ {{ .Last_Comment.Likes}} -  <img src="{{ .Last_Comment.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
+              </div>
+          </div>
+      </a>
     </div>
   </div>
 </div>

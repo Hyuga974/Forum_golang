@@ -39,29 +39,31 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 			}
 			title := r.FormValue("title")
 			body := r.FormValue("body")
-			image := r.FormValue("myFile")
+			var image string
 			file, handler, err := r.FormFile("myFile")
 			if err != nil {
-				fmt.Println("Error Retrieving the File")
+				image = r.FormValue("myFile")
 				fmt.Println(err)
-				return
+			} else {
+				defer file.Close()
+				fmt.Printf("Uploaded File: %+v\n", strings.ReplaceAll(handler.Filename, " ", "-"))
+				fmt.Printf("File Size: %+v\n", handler.Size)
+				fmt.Printf("MIME Header: %+v\n", handler.Header)
+
+				absPath, _ := filepath.Abs("../src/assets/posts/" + strings.ReplaceAll(handler.Filename, " ", "-"))
+
+				resFile, err := os.Create(absPath)
+				if err != nil {
+					fmt.Print(w, err)
+				}
+				defer resFile.Close()
+
+				io.Copy(resFile, file)
+				defer resFile.Close()
+				fmt.Print("File uploaded")
+
+				image = "../assets/posts/" + strings.ReplaceAll(handler.Filename, " ", "-")
 			}
-			defer file.Close()
-			fmt.Printf("Uploaded File: %+v\n", strings.ReplaceAll(handler.Filename, " ", "-"))
-			fmt.Printf("File Size: %+v\n", handler.Size)
-			fmt.Printf("MIME Header: %+v\n", handler.Header)
-
-			absPath, _ := filepath.Abs("../src/assets/posts/" + strings.ReplaceAll(handler.Filename, " ", "-"))
-
-			resFile, err := os.Create(absPath)
-			if err != nil {
-				fmt.Print(w, err)
-			}
-			defer resFile.Close()
-
-			io.Copy(resFile, file)
-			defer resFile.Close()
-			fmt.Print("File uploaded")
 
 			likes := 0
 			comment_nb := 0
@@ -77,47 +79,55 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 
 			if title != "" && body != "" && categoriesCheck != "" {
 				user_id := user.ID
+				var tabAllCat []CATEGORIES
 
 				_, err := datab.Exec(title, categoriesCheck, body, user_id, image, likes, comment_nb, since)
 				if err != nil {
 					fmt.Println(err.Error())
 				}
-			}
-			tabCategoriesCheck := strings.Split(categoriesCheck, ";")
-			for _, x := range tabCategoriesCheck {
-				oneCategorie := CATEGORIES{
-					Cat:   x,
-					Color: color[x],
+
+				tabCategoriesCheck := strings.Split(categoriesCheck, ";")
+				for _, x := range tabCategoriesCheck {
+					oneCategorie := CATEGORIES{
+						Cat:   x,
+						Color: color[x],
+					}
+					tabCat = append(tabCat, oneCategorie)
 				}
-				tabCat = append(tabCat, oneCategorie)
-			}
-			Post = POSTINFO{
-				User_ID:    user.ID,
-				Title:      title,
-				Body:       body,
-				Image:      image,
-				Categories: tabCat,
-				Since:      since,
-			}
+				for _, x := range tabCategories {
+					oneCategorie := CATEGORIES{
+						Cat:   x,
+						Color: color[x],
+					}
+					tabAllCat = append(tabAllCat, oneCategorie)
+				}
+				Post = POSTINFO{
+					User_ID:       user.ID,
+					Title:         title,
+					Body:          body,
+					Image:         image,
+					Categories:    tabCat,
+					Since:         since,
+					AllCategories: tabAllCat,
+				}
 
-			uId := strconv.Itoa(user.ID)
+				uId := strconv.Itoa(user.ID)
 
-			newPost, err := db.Query("SELECT * FROM Posts WHERE user_id=" + uId + " ORDER BY id DESC LIMIT 1")
-			fmt.Println(newPost)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			var id string
-			var categories string
-			var user_id int
-			for newPost.Next() {
-				err = newPost.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
-				CheckErr(err)
-			}
-			newPost.Close()
-			fmt.Println("id post:  ", id)
+				newPost, err := db.Query("SELECT * FROM Posts WHERE user_id=" + uId + " ORDER BY id DESC LIMIT 1")
+				fmt.Println(newPost)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+				var id string
+				var categories string
+				for newPost.Next() {
+					err = newPost.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
+					CheckErr(err)
+				}
+				newPost.Close()
 
-			http.Redirect(w, r, "/post?id="+id, 301)
+				http.Redirect(w, r, "/post?id="+id, 301)
+			}
 		} else {
 			for _, x := range tabCategories {
 				oneCategorie := CATEGORIES{

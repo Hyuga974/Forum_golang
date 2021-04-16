@@ -13,6 +13,10 @@ type ALLINFO struct {
 	Post_Most_Recent    []POSTINFO
 	Post_Most_Likes     []POSTINFO
 	Currently_Post_Like string
+
+	Last_Post    POSTINFO
+	Last_Like    POSTINFO
+	Last_Comment POSTINFO
 }
 
 //INFO: Déstiné à fournir des informations du user

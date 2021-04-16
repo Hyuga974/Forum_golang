@@ -243,19 +243,21 @@ func GetUser(id int) INFO {
 				Country:     country,
 			}
 			userAllPost = GetPost(userinfo)
-			userinfo = INFO{
-				ID:          id,
-				Email:       email,
-				PassWord:    password,
-				UserName:    username,
-				Since:       since,
-				Description: description,
-				Image:       image,
-				Country:     country,
-				AllPosts:    userAllPost,
-			}
+
 			break
 		}
+	}
+
+	userinfo = INFO{
+		ID:          id,
+		Email:       email,
+		PassWord:    password,
+		UserName:    username,
+		Since:       since,
+		Description: description,
+		Image:       image,
+		Country:     country,
+		AllPosts:    userAllPost,
 	}
 	fmt.Println("Fin de Scan")
 	tabusers.Close()
