@@ -62,7 +62,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := ALLINFO{
-		User_Info:   Info,
+		Self_User_Info:   Info,
 		All_Country: allcountry,
 	}
 

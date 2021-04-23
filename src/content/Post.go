@@ -152,7 +152,7 @@ func EditPost(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/post?id="+strconv.Itoa(post_info.ID), 301)
 			}
 			data := ALLINFO{
-				User_Info: user,
+				Self_User_Info: user,
 				Post_Info: post_info,
 			}
 
@@ -213,7 +213,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 			Comment_Nb: comments_nb,
 		}
 
-		if user.ID == post_info.User_ID {
+		if user.ID == post_info.User_ID /* || user.Admin */{
 
 			del, _ := db.Prepare("DELETE from Posts WHERE id=?")
 
@@ -226,7 +226,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 			del.Close()
 			http.Redirect(w, r, "/posts", 301)
 			data := ALLINFO{
-				User_Info: user,
+				Self_User_Info: user,
 				Post_Info: post_info,
 			}
 
@@ -311,6 +311,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 				datab.Close()
 			} else {
 				if r.FormValue("Suppr") != "" {
+					fmt.Println("---------- Suppr -----------")
 					upost_id, err := strconv.Atoi(post_id)
 					if userInfo.ID == upost_id {
 
@@ -490,7 +491,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 
 	//Recupération des user_info du user qui a posté
 	post_user_info := GetUser(user_id)
-	if post_user_info.ID == userInfo.ID {
+	if post_user_info.ID == userInfo.ID /* || userInfo.admin */{
 		deletable = true
 	}
 	post_info := POSTINFO{
@@ -508,7 +509,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := ALLINFO{
-		User_Info:           userInfo,
+		Self_User_Info:           userInfo,
 		Post_Info:           post_info,
 		Currently_Post_Like: likeNow,
 	}

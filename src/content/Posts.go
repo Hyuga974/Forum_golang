@@ -115,7 +115,7 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := ALLINFO{
-		User_Info: user,
+		Self_User_Info: user,
 		Post_Info: postInfo,
 
 		All_User:  allUsers,

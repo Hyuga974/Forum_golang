@@ -29,15 +29,15 @@ ete{{ define "main" }}
                     </ul>
                     <li class="nav-item dropdown d-flex" style="margin-right: 6%;">
                         <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                             {{ if .User_Info.Login }}
-                                <img width="25" height="25" style="border-radius: 50%;" src="{{ .User_Info.Image }}" alt="Photo de profil">
+                             {{ if .Self_User_Info.Login }}
+                                <img width="25" height="25" style="border-radius: 50%;" src="{{ .Self_User_Info.Image }}" alt="Photo de profil">
                             {{ else }}
                             <i class="far fa-user"></i> 
                             {{ end }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {{ if .User_Info.Login}}
-                            <li><a class="dropdown-item" href="/profil">Modifier le profil</a></li>
+                            {{ if .Self_User_Info.Login}}
+                            <li><a class="dropdown-item" name="ID" href="/profil?ID=" value="self">Modifier le profil</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -60,7 +60,7 @@ ete{{ define "main" }}
 
     {{ template "body" .}}
 
-    {{ if .User_Info.Login }}
+    {{ if .Self_User_Info.Login }}
     <a href="/newpost" class="float" style="color: inherit;">
         <i class="fa fa-plus my-float"></i>
     </a>

@@ -8,18 +8,20 @@
         myInput.focus()
     })
 </script>
+
+{{ if .ItsYou}}
 <form enctype="multipart/form-data" method="POST">
     <div class="media-body mb-5 text-black">
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Edit Profile</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Edit Profile </h5>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
                             <label class="col-form-label" for="inputDefault">Username:</label>
-                            <input type="text" class="form-control" name="Username" placeholder="Bah faut écrire ici enculé" id="inputDefault">
+                            <input type="text" class="form-control" name="Username" placeholder="Enter Username" id="inputDefault">
                         </div>
                         <form>
                             <div class="mb-3">
@@ -55,7 +57,80 @@
     </div>
     </div>
 </form>
-<div class="container-fluid">
+<div class="container-fluid mt-5">
+    <div class="row">
+        <!--py-10 px-7-->
+        <div class="col-xl-3 d-flex justify-content-center align-items-center text-center">
+            <center>
+                <div class="card" style="width: 18rem; float: left;">
+                    <img src="{{ .Self_User_Info.Image }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ .Self_User_Info.UserName }}</h5>
+                        <p class="card-text">{{ .Self_User_Info.Description }}</p>
+
+                        <a href="#" class="btn btn-outline-secondary btn-sm btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit Profile</a>
+                    </div>
+                </div>
+            </center>
+        </div>
+        <div class="col-xl-5 mx-auto align-self-center">
+            <div class="row row-cols-1 g-4">
+                <div class="bg-light" style="overflow-y:scroll; height:400px;">
+                    {{ range $post := .Self_User_Info.AllPosts }}
+                    <div class="col">
+                        <a href="/post?id={{ $post.ID }}" class="custom-card">
+                            <div class="card positon-relative card-c">
+                                <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                                    <h5 class="card-title">{{$post.Title}}</h5>
+                                    <p class="card-text text-truncate">{{ $post.Body }}</p>
+                                    <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ $post.Comment_Nb}} - ❤️ {{ $post.Likes}} - <img src="{{ $post.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
+                                </div>
+                            </div>
+                        </a>
+
+                    </div>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <h4>Dernier Post</h4>
+            <a href="/post?id={{ .Last_Post.ID }}" class="custom-card">
+                <div class="card positon-relative card-c">
+                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                        <h5 class="card-title">{{ .Last_Post.Title}}</h5>
+                        <p class="card-text text-truncate">{{ .Last_Post.Body }}</p>
+                        <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ .Last_Post.Comment_Nb}} - ❤️ {{ .Last_Post.Likes}} - <img src="{{ .Last_Post.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
+                    </div>
+                </div>
+            </a>
+            <br>
+            <h4>Dernier Like</h4>
+            <a href="/post?id={{ .Last_Like.ID }}" class="custom-card">
+                <div class="card positon-relative card-c">
+                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                        <h5 class="card-title">{{ .Last_Like.Title}}</h5>
+                        <p class="card-text text-truncate">{{ .Last_Like.Body }}</p>
+                        <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ .Last_Like.Comment_Nb}} - ❤️ {{ .Last_Like.Likes}} - <img src="{{ .Last_Like.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
+                    </div>
+                </div>
+            </a>
+            <br>
+            <h4>Dernier Commentaire</h4>
+            <a href="/post?id={{ .Last_Comment.ID }}" class="custom-card">
+                <div class="card positon-relative card-c">
+                    <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
+                        <h5 class="card-title">{{ .Last_Comment.Title}}</h5>
+                        <p class="card-text text-truncate">{{ .Last_Comment.Body }}</p>
+                        <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ .Last_Comment.Comment_Nb}} - ❤️ {{ .Last_Comment.Likes}} - <img src="{{ .Last_Comment.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;">                            </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{{ else }}
+<div class="container-fluid mt-5">
     <div class="row">
         <!--py-10 px-7-->
         <div class="col-xl-3 d-flex justify-content-center align-items-center text-center">
@@ -65,7 +140,6 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ .User_Info.UserName }}</h5>
                         <p class="card-text">{{ .User_Info.Description }}</p>
-                        <a href="#" class="btn btn-outline-white btn-sm btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit Profile</a>
                     </div>
                 </div>
             </center>
@@ -126,6 +200,7 @@
         </div>
     </div>
 </div>
+{{ end }}
 
 <script src="../assets/main.js"></script>
 

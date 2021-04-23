@@ -1,13 +1,4 @@
-{{ template "main" . }} {{ define "body" }}
-<script>
-    var myModal = document.getElementById('myModal')
-    var myInput = document.getElementById('myInput')
-
-    myModal.addEventListener('shown.bs.modal', function() {
-        myInput.focus()
-    })
-</script>
-
+ {{ template "main" . }} {{ define "body" }}
 
 <form method="POST" class="needs-validation" novalidate>
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -19,9 +10,8 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="col-form-label" for="inputDefault">Title:</label>
-                        <input type="text" class="form-control" name="SignalTitle" placeholder="Bah faut écrire ici enculé" id="inputDefault">
+                        <input type="text" class="form-control" name="SignalTitle" placeholder="Titre du post" id="inputDefault">
                     </div>
-                    <form>
                         <div class="mb-3">
                             <label for="message-text" class="col-form-label">User:</label>
                             <input class="form-control" name="SignalUser" placeholder="Qui a écrit ce post" id="message-text">
@@ -31,8 +21,6 @@
                             <label for="message-text" class="col-form-label">Autre Chose ?</label>
                             <textarea class="form-control" name="SignalOther" id="message-text"></textarea>
                         </div>
-                    </form>
-
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save changes</button>
@@ -41,6 +29,7 @@
             </div>
         </div>
     </div>
+
 
 
     <div class="border border-secondary container rounded-3 pl-2 pr-2 pb-2 mt-5">
@@ -55,7 +44,7 @@
             </div>
         </div>
 
-        <p style="float:right">{{ .Post_Info.Post_User_Info.UserName }}</p>
+        <a style="float:right; text-decoration: none; color: inherit" name="ID" href="/profil?ID={{ .Post_Info.Post_User_Info.ID}}" value="{{ .Post_Info.Post_User_Info.ID}}">{{ .Post_Info.Post_User_Info.UserName }}</a>
         <img src="{{ .Post_Info.Post_User_Info.Image }}" class="mx-1 mt-1" style="float:right;border-radius: 100%;height:25px;width:25px;">
         <p style="float:right"> <input name="Liker" type="checkbox" id="checkbox" {{ .Currently_Post_Like }} onchange="submit()" />
             <label for="checkbox">
@@ -125,12 +114,12 @@
     <br>
     <div class="container">
         <input type="text" name="comment" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;" required>
-        <button class="btn btn-outline-secondary">
+        <button type="submit" class="btn btn-outline-secondary">
             <i class="fas fa-paper-plane">
-            </i>
+            
             Commenter
-          </button>
-        </input>
+            </i>
+        </button>
     </div>
 </form>
 <br>
@@ -147,6 +136,16 @@
     </div>
     {{ end }}
 </div>
+
+<script>
+    var myModal = document.getElementById('myModal')
+    var myInput = document.getElementById('myInput')
+
+    myModal.addEventListener('shown.bs.modal', function() {
+        myInput.focus()
+    })
+</script>
+
 <script>
     {
         {

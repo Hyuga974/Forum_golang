@@ -4,8 +4,11 @@ import "time"
 
 //POSTINFO: Informations pour un Post
 type ALLINFO struct {
-	User_Info INFO
+	Self_User_Info INFO
+	ItsYou bool
+	User_Info	INFO
 	Post_Info POSTINFO
+
 
 	All_User            []INFO
 	All_Country         []string
@@ -31,6 +34,7 @@ type INFO struct {
 	Country     string
 	Login       bool
 	Msg         string
+	Admin 		bool
 
 	AllPosts []POSTINFO
 }

@@ -98,7 +98,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := ALLINFO{
-		User_Info: userinfo,
+		Self_User_Info: userinfo,
 	}
 	files := []string{"template/Connexion.html", "template/Common.html"}
 	tmp, err := template.ParseFiles(files...)
