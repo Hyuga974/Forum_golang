@@ -46,8 +46,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			var description string
 			var image string
 			var country string
+			var modB int
+			var mod bool
 			for test.Next() {
-				err = test.Scan(&id, &username, &email, &since, &description, &Password, &image, &country)
+				err = test.Scan(&id, &username, &email, &since, &description, &Password, &image, &country, &mod)
 				CheckErr(err)
 				if email == r.FormValue("mail") {
 					mailfound = true
@@ -59,6 +61,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 			test.Close()
 			fmt.Printf("Before: mailfound --> %v \n", mailfound)
+			mod = IntToBool(modB)
 			if mailfound {
 				fmt.Print("Into mailfound")
 				cryptedPassword := []byte(Password)
@@ -74,6 +77,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 						Description: description,
 						Image:       image,
 						Country:     country,
+						Admin:       mod,
 						Login:       true,
 						Msg:         "Vous êtes connecté en tant que " + username,
 					}

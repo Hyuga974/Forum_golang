@@ -14,15 +14,15 @@ import (
 
 func Profil(w http.ResponseWriter, r *http.Request) {
 
-	userID:=r.FormValue("ID")
+	userID := r.FormValue("ID")
 	user := GetSession(r)
 	userIDS := strconv.Itoa(user.ID)
-	itsyou:=true
-	
+	itsyou := true
+
 	files := []string{"template/Profil.html", "template/Common.html"}
 	db, _ := sql.Open("sqlite3", "database/database.db")
 
-	if userID!=""{
+	if userID != "" {
 		verifID, _ := db.Query("SELECT * FROM Users where id=" + userID)
 		var tableverif []INFO
 		var id int
@@ -33,11 +33,11 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 		var password string
 		var image string
 		var country string
-		fmt.Println("ICI")
-		for verifID.Next(){
-			fmt.Println("LA")
-			err := verifID.Scan(&id, &username, &email, &since, &description, &password, &image, &country)
+		var mod int
+		for verifID.Next() {
+			err := verifID.Scan(&id, &username, &email, &since, &description, &password, &image, &country, &mod)
 			CheckErr(err)
+			modB := IntToBool(mod)
 			verifInfo := INFO{
 				ID:          id,
 				Email:       email,
@@ -47,25 +47,25 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 				Description: description,
 				Image:       image,
 				Country:     country,
+				Admin:       modB,
 				Login:       true,
 			}
-			tableverif=append(tableverif, verifInfo)
+			tableverif = append(tableverif, verifInfo)
 		}
-		if len(tableverif)==0{
+		if len(tableverif) == 0 {
 			files = []string{"template/404.html"}
 		}
 	}
 
-	
 	var userTarget INFO
-	
+
 	var post_info_last_posted POSTINFO
 	var post_info_last_like POSTINFO
 	var post_info_last_comment POSTINFO
-	if userID != userIDS && userID !=""{
-		userIDString, _:=strconv.Atoi(userID)
-		userTarget=GetUser(userIDString)
-		itsyou=false
+	if userID != userIDS && userID != "" {
+		userIDString, _ := strconv.Atoi(userID)
+		userTarget = GetUser(userIDString)
+		itsyou = false
 
 		//Récupèrelast post
 		lastpost, err := db.Query("SELECT * FROM Posts where user_id=" + strconv.Itoa(userTarget.ID) + " ORDER BY id DESC LIMIT 1")
@@ -200,7 +200,7 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 		}
 		lastpostcomment.Close()
 
-	}else{
+	} else {
 		itsyou = true
 		//Récupèrelast post
 		lastpost, err := db.Query("SELECT * FROM Posts where user_id=" + strconv.Itoa(user.ID) + " ORDER BY id DESC LIMIT 1")
@@ -336,7 +336,7 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 		lastpostcomment.Close()
 
 	}
-	
+
 	if r.Method == "POST" {
 		r.ParseMultipartForm(10 << 20) //max size 10Mb (5mb for the pf)
 		old_Description := user.Description
@@ -411,18 +411,16 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 		user = GetSession(r)
 	}
 
-	
 	allcountry := getPays()
 
 	data := ALLINFO{
-		All_Country:  allcountry,
-		Self_User_Info:    user,
-		ItsYou: itsyou, 
-		User_Info: userTarget ,
-		Last_Post:    post_info_last_posted,
-		Last_Like:    post_info_last_like,
-		Last_Comment: post_info_last_comment,
-
+		All_Country:    allcountry,
+		Self_User_Info: user,
+		ItsYou:         itsyou,
+		User_Info:      userTarget,
+		Last_Post:      post_info_last_posted,
+		Last_Like:      post_info_last_like,
+		Last_Comment:   post_info_last_comment,
 	}
 
 	tmp, err := template.ParseFiles(files...)

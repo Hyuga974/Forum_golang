@@ -19,6 +19,9 @@ func main() {
 	http.HandleFunc("/newpost", content.CreationPost)
 	http.HandleFunc("/editpost", content.EditPost)
 	http.HandleFunc("/deletepost", content.DeletePost)
+	http.HandleFunc("/adminuser", content.AdminUser)
+	http.HandleFunc("/adminpost", content.AdminPosts)
+
 	http.HandleFunc("/profil", content.Profil)
 	http.HandleFunc("/login", content.Login)
 	http.HandleFunc("/register", content.Register)
@@ -26,5 +29,3 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 
 }
-
-

@@ -153,7 +153,7 @@ func EditPost(w http.ResponseWriter, r *http.Request) {
 			}
 			data := ALLINFO{
 				Self_User_Info: user,
-				Post_Info: post_info,
+				Post_Info:      post_info,
 			}
 
 			files := []string{"template/EditPost.html", "template/Common.html"}
@@ -213,7 +213,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 			Comment_Nb: comments_nb,
 		}
 
-		if user.ID == post_info.User_ID /* || user.Admin */{
+		if user.ID == post_info.User_ID || user.Admin {
 
 			del, _ := db.Prepare("DELETE from Posts WHERE id=?")
 
@@ -227,7 +227,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/posts", 301)
 			data := ALLINFO{
 				Self_User_Info: user,
-				Post_Info: post_info,
+				Post_Info:      post_info,
 			}
 
 			files := []string{"template/EditPost.html", "template/Common.html"}
@@ -491,7 +491,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 
 	//Recupération des user_info du user qui a posté
 	post_user_info := GetUser(user_id)
-	if post_user_info.ID == userInfo.ID /* || userInfo.admin */{
+	if post_user_info.ID == userInfo.ID || userInfo.Admin {
 		deletable = true
 	}
 	post_info := POSTINFO{
@@ -509,7 +509,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := ALLINFO{
-		Self_User_Info:           userInfo,
+		Self_User_Info:      userInfo,
 		Post_Info:           post_info,
 		Currently_Post_Like: likeNow,
 	}

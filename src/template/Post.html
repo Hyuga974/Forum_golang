@@ -1,46 +1,15 @@
  {{ template "main" . }} {{ define "body" }}
 
 <form method="POST" class="needs-validation" novalidate>
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Signaler</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="col-form-label" for="inputDefault">Title:</label>
-                        <input type="text" class="form-control" name="SignalTitle" placeholder="Titre du post" id="inputDefault">
-                    </div>
-                        <div class="mb-3">
-                            <label for="message-text" class="col-form-label">User:</label>
-                            <input class="form-control" name="SignalUser" placeholder="Qui a écrit ce post" id="message-text">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="message-text" class="col-form-label">Autre Chose ?</label>
-                            <textarea class="form-control" name="SignalOther" id="message-text"></textarea>
-                        </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
     <div class="border border-secondary container rounded-3 pl-2 pr-2 pb-2 mt-5">
         <!-- CATEGORIE -->
         <div class="dropdown">
             <i class="fas fa-ellipsis-v mt-1" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float:right; margin-left: 10px;"></i>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">{{ if .Post_Info.Deletable }}
                 <a class="dropdown-item" href="/editpost?id={{ .Post_Info.ID }}">Modifier le post</a>
-                <a class="dropdown-item" style="color:red" href="/deletepost?id={{ .Post_Info.ID }}">Supprimer le post</a>
+                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" style="color:red">Supprimer le post</a>
                 <hr class="dropdown-divider"> {{ end }}
-                <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal">Signaler</a>
+                <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#signalModal">Signaler</a>
             </div>
         </div>
 
@@ -116,9 +85,8 @@
         <input type="text" name="comment" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;" required>
         <button type="submit" class="btn btn-outline-secondary">
             <i class="fas fa-paper-plane">
-            
-            Commenter
             </i>
+            Commenter
         </button>
     </div>
 </form>
@@ -127,9 +95,9 @@
     {{ range $comment:= .Post_Info.All_Comments }}
     <div class="row">
         <div class="border rounded-3 col mt-1">
-            <div class="text mt-3">
+            <div class="text mt-2">
                 <h6 class="float-start">{{ $comment.Body }}</h6>
-                <p class="float-end"> {{ $comment.User_Info.UserName}} </p>
+                <a class="float-end mb-2" style="float:right; text-decoration: none; color: inherit" name="ID" href="/profil?ID={{ $comment.User_Info.ID}}" value="{{ $comment.User_Info.ID }}"> {{ $comment.User_Info.UserName}} </a>
                 <img src="{{ $comment.User_Info.Image}}" class="mx-1" style="float:right;border-radius: 100%;height:25px;width:25px;">
             </div>
         </div>
@@ -137,6 +105,54 @@
     {{ end }}
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmation de suppression.</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Êtes-vous sûr de vouloir supprimer ce post ?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+          <a type="button" href="/deletepost?id={{ .Post_Info.ID }}"  type="button" class="btn btn-danger">Supprimer</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="signalModal" tabindex="-1" aria-labelledby="signalModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Signaler</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-form-label" for="inputDefault">Title:</label>
+                        <input type="text" class="form-control" name="SignalTitle" placeholder="Titre du post" id="inputDefault">
+                    </div>
+                        <div class="mb-3">
+                            <label for="message-text" class="col-form-label">User:</label>
+                            <input class="form-control" name="SignalUser" placeholder="Qui a écrit ce post" id="message-text">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="message-text" class="col-form-label">Autre Chose ?</label>
+                            <textarea class="form-control" name="SignalOther" id="message-text"></textarea>
+                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Modal script -->
 <script>
     var myModal = document.getElementById('myModal')
     var myInput = document.getElementById('myInput')
@@ -144,32 +160,6 @@
     myModal.addEventListener('shown.bs.modal', function() {
         myInput.focus()
     })
-</script>
-
-<script>
-    {
-        {
-            /* (function() {
-                    'use strict'
-
-                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                    var forms = document.querySelectorAll('.needs-validation:not(.passwd)')
-
-                    // Loop over them and prevent submission
-                    Array.prototype.slice.call(forms)
-                        .forEach(function(form) {
-                            form.addEventListener('submit', function(event) {
-                                if (!form.checkValidity()) {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                }
-
-                                form.classList.add('was-validated')
-                            }, false)
-                        })
-                })() */
-        }
-    }
 </script>
 
 <script src="../assets/main.js"></script>

@@ -82,7 +82,6 @@ func CheckSession(r *http.Request) (bool, int) {
 
 func GetSession(r *http.Request) INFO {
 	var userinfo INFO
-	color := RandomColor()
 	fmt.Println("Get Session")
 	cExist, idSession := CheckSession(r)
 	if cExist {
@@ -102,96 +101,28 @@ func GetSession(r *http.Request) INFO {
 		var description string
 		var image string
 		var country string
-
-		var all_Post []POSTINFO
+		var mod int
 
 		for tabusers.Next() {
-			err = tabusers.Scan(&id, &username, &email, &since, &description, &password, &image, &country)
+			err = tabusers.Scan(&id, &username, &email, &since, &description, &password, &image, &country, &mod)
 			CheckErr(err)
 
 			if id == idSession {
 
-				var postID int
-				var title string
-				var categorie string
-				var body string
-				var userID int
-				var postImage string
-				var likes int
-				var comment_nb int
-				var since string
-
-				post, _ := db.Query("SELECT * from Posts WHERE user_id=" + strconv.Itoa(id))
-				for post.Next() {
-					err = post.Scan(&postID, &title, &categorie, &body, &userID, &postImage, &likes, &comment_nb, &since)
-					if id == userID {
-
-						tabCategories := strings.Split(categorie, ";")
-						var tabCat []CATEGORIES
-						for _, x := range tabCategories {
-							oneCategorie := CATEGORIES{
-								Cat:   x,
-								Color: color[x],
-							}
-							tabCat = append(tabCat, oneCategorie)
-						}
-
-						var post_user_info INFO
-						var post_user_id int
-						var post_user_email string
-						var post_user_password string
-						var post_user_username string
-						var post_user_description string
-						var post_user_since string
-						var post_user_image2 string
-						var post_user_country string
-						user, _ := db.Query("SELECT * FROM Users Where id=" + strconv.Itoa(userID))
-						for user.Next() {
-							err = user.Scan(&post_user_id, &post_user_username, &post_user_email, &post_user_since, &post_user_description, &post_user_password, &post_user_image2, &post_user_country)
-							CheckErr(err)
-							if id == post_user_id {
-								post_user_info = INFO{
-									ID:          post_user_id,
-									Email:       post_user_email,
-									PassWord:    post_user_password,
-									UserName:    post_user_username,
-									Since:       post_user_since,
-									Description: post_user_description,
-									Image:       post_user_image2,
-									Country:     post_user_country,
-								}
-								break
-							}
-						}
-						user.Close()
-						post_info := POSTINFO{
-							ID:         postID,
-							User_ID:    id,
-							Title:      title,
-							Body:       body,
-							Image:      postImage,
-							Categories: tabCat,
-							Likes:      likes,
-							Comment_Nb: comment_nb,
-
-							Post_User_Info: post_user_info,
-						}
-
-						all_Post = append(all_Post, post_info)
-					}
-				}
-				post.Close()
+				user := GetUser(id)
+				posts := GetPost(user)
 				userinfo = INFO{
 					ID:          id,
-					Email:       email,
-					PassWord:    password,
-					UserName:    username,
-					Since:       since,
-					Description: description,
-					Image:       image,
-					Country:     country,
+					Email:       user.Email,
+					PassWord:    user.PassWord,
+					UserName:    user.UserName,
+					Since:       user.Since,
+					Description: user.Description,
+					Image:       user.Image,
+					Country:     user.Country,
+					Admin:       user.Admin,
 					Login:       true,
-					AllPosts:    all_Post,
+					AllPosts:    posts,
 				}
 				break
 			}
@@ -222,8 +153,9 @@ func GetUser(id int) INFO {
 	var password string
 	var country string
 	var since string
+	var mod int
 	for tabusers.Next() {
-		err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
+		err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country, &mod)
 		CheckErr(err)
 		if userID == id {
 			userinfo = INFO{
@@ -235,12 +167,15 @@ func GetUser(id int) INFO {
 				Description: description,
 				Image:       image,
 				Country:     country,
+				Mod:         mod,
 			}
 			userAllPost = GetPost(userinfo)
 
 			break
 		}
 	}
+
+	admin := IntToBool(userinfo.Mod)
 
 	userinfo = INFO{
 		ID:          id,
@@ -251,6 +186,7 @@ func GetUser(id int) INFO {
 		Description: description,
 		Image:       image,
 		Country:     country,
+		Admin:       admin,
 		AllPosts:    userAllPost,
 	}
 	tabusers.Close()
@@ -258,6 +194,13 @@ func GetUser(id int) INFO {
 	return userinfo
 }
 
+func IntToBool(mod int) bool {
+	if mod == 1 {
+		return true
+	} else {
+		return false
+	}
+}
 func GetPost(user INFO) []POSTINFO {
 	var all_Post []POSTINFO
 	db, err := sql.Open("sqlite3", "database/database.db")

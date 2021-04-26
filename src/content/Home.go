@@ -8,7 +8,6 @@ import (
 	"text/template"
 )
 
-
 // servHome : //* Page d'acceuil
 func ServeHome(w http.ResponseWriter, r *http.Request) {
 	user := GetSession(r)
@@ -49,7 +48,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err.Error())
 		}
 		var userinfo INFO
-		var userAllPost []POSTINFO
 		var userID int
 		var username string
 		var email string
@@ -57,32 +55,13 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 		var description string
 		var password string
 		var country string
+		var mod int
 		for tabusers.Next() {
-			err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
+			err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country, &mod)
 			CheckErr(err)
+
 			if userID == user_id {
-				userinfo = INFO{
-					ID:          userID,
-					Email:       email,
-					PassWord:    password,
-					UserName:    username,
-					Since:       since,
-					Description: description,
-					Image:       image,
-					Country:     country,
-				}
-				userAllPost = GetPost(user)
-				userinfo = INFO{
-					ID:          userID,
-					Email:       email,
-					PassWord:    password,
-					UserName:    username,
-					Since:       since,
-					Description: description,
-					Image:       image,
-					Country:     country,
-					AllPosts:    userAllPost,
-				}
+				userinfo = GetUser(userID)
 				break
 			}
 		}
@@ -126,7 +105,6 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err.Error())
 		}
 		var userinfo INFO
-		var userAllPost []POSTINFO
 		var userID int
 		var username string
 		var email string
@@ -134,32 +112,12 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 		var description string
 		var password string
 		var country string
+		var mod int
 		for tabusers.Next() {
-			err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country)
+			err = tabusers.Scan(&userID, &username, &email, &since, &description, &password, &image, &country, &mod)
 			CheckErr(err)
 			if userID == user_id {
-				userinfo = INFO{
-					ID:          userID,
-					Email:       email,
-					PassWord:    password,
-					UserName:    username,
-					Since:       since,
-					Description: description,
-					Image:       image,
-					Country:     country,
-				}
-				userAllPost = GetPost(user)
-				userinfo = INFO{
-					ID:          userID,
-					Email:       email,
-					PassWord:    password,
-					UserName:    username,
-					Since:       since,
-					Description: description,
-					Image:       image,
-					Country:     country,
-					AllPosts:    userAllPost,
-				}
+				userinfo = GetUser(userID)
 				break
 			}
 		}
@@ -186,7 +144,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 
 	data := ALLINFO{
 		Self_User_Info: user,
-		Post_Info: POSTINFO{},
+		Post_Info:      POSTINFO{},
 
 		Post_Most_Recent: mostRecent,
 		Post_Most_Likes:  mostLikes,

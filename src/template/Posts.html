@@ -38,6 +38,8 @@
                         <div class="card positon-relative card-c">
                             <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
                                 <h5 class="card-title">{{$post.Title}}</h5>
+                                {{ range $categories := $post.Categories }}
+                                    <i type="submit" name="{{ $categories.Cat }}" value="{{ $categories.Cat }}" class="badge rounded-pill" style="background-color:{{ $categories.Color }};">{{ $categories.Cat }}</i> {{ end }}
                                 <p class="card-text text-truncate">{{ $post.Body }}</p>
                                 <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ $post.Comment_Nb}} - ❤️ {{ $post.Likes}} - <img src="{{ $post.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
                             </div>

@@ -1,0 +1,29 @@
+{{ template "main" . }} {{ define "body" }}
+<div class="container">
+    <h1>Controle des Users</h1><br>
+    <div class="row row-cols-3 g-3">
+        {{ range $user := .All_User }}
+        <div class="col">
+            <div class="card" style="width: 18rem; height: 100%;"  style="max-wight: 50%; max-height: auto;">
+                <img src="{{ $user.Image }}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $user.UserName}}</h5>
+                    <p class="card-text">{{ $user.Description }}</p>
+                </div>
+                <a href="/profil?ID={{$user.ID}}" type="button" class="btn btn-outline-secondary">Accèder au profil</a>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</div>
+
+
+<script>
+    var myModal = document.getElementById('myModal')
+    var myInput = document.getElementById('myInput')
+
+    myModal.addEventListener('shown.bs.modal', function() {
+        myInput.focus()
+    })
+</script>
+{{ end }}

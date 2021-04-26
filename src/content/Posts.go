@@ -99,9 +99,9 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 	var username string
 	var description string
 	var country string
-
+	var mod int
 	for users.Next() {
-		err = users.Scan(&id, &username, &email, &since, &description, &password, &image, &country)
+		err = users.Scan(&id, &username, &email, &since, &description, &password, &image, &country, &mod)
 		CheckErr(err)
 		currentlyUser = GetUser(id)
 		allUsers = append(allUsers, currentlyUser)
@@ -116,7 +116,7 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 
 	data := ALLINFO{
 		Self_User_Info: user,
-		Post_Info: postInfo,
+		Post_Info:      postInfo,
 
 		All_User:  allUsers,
 		All_Posts: all_Post,
