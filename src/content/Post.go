@@ -51,12 +51,8 @@ func EditPost(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		//sport, anime/manga, economie, jeux vidéo, informatique, voyages, NEW, paranormal.
-		allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
-		tabAllCategories := strings.Split(allCategories, ";")
-
 		var tabAllCat []CATEGORIES
-		for _, x := range tabAllCategories {
+		for x, _ := range color {
 			var check string
 			for _, y := range tabCategories {
 				if y == x {
@@ -94,9 +90,9 @@ func EditPost(w http.ResponseWriter, r *http.Request) {
 				newBody := r.FormValue("body")
 				newImage := r.FormValue("Image")
 				var newCategories string
-				for _, categorie := range tabAllCategories {
-					if r.FormValue(categorie) != "" {
-						newCategories += categorie + ";"
+				for x := range color {
+					if r.FormValue(x) != "" {
+						newCategories += x + ";"
 					}
 				}
 				tabCategoriesCheck := strings.Split(newCategories, ";")
@@ -169,15 +165,15 @@ func EditPost(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Server Error", 500)
 			}
 		}
+		db.Close()
 	} else {
 		http.Redirect(w, r, "/login", 301)
 	}
 }
 
-func DeletePost(w http.ResponseWriter, r *http.Request) {
-	user := GetSession(r)
+func DeletePost(id string, user INFO) {
 
-	postID := r.FormValue("id")
+	postID := id
 	if user.UserName != "" {
 		var post_id int
 		var title string
@@ -217,34 +213,39 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 
 			del, _ := db.Prepare("DELETE from Posts WHERE id=?")
 
-			res, err := del.Exec(strconv.Itoa(post_info.ID))
+			res, err := del.Exec(post_info.ID)
 			CheckErr(err)
 
 			_, err = res.RowsAffected()
 			CheckErr(err)
 
 			del.Close()
-			http.Redirect(w, r, "/posts", 301)
-			data := ALLINFO{
-				Self_User_Info: user,
-				Post_Info:      post_info,
-			}
 
-			files := []string{"template/EditPost.html", "template/Common.html"}
-			tmp, err := template.ParseFiles(files...)
-			if err != nil {
-				fmt.Println(err)
-				http.Error(w, "Server Error: Check template", 500)
-			}
+			comment, err := db.Prepare("DELETE from Comments WHERE post_id=?")
 
-			err = tmp.Execute(w, data)
-			if err != nil {
-				fmt.Println(err)
-				http.Error(w, "Server Error", 500)
-			}
+			CheckErr(err)
+
+			res, err = comment.Exec(post_info.ID)
+			CheckErr(err)
+
+			_, err = res.RowsAffected()
+			CheckErr(err)
+
+			comment.Close()
+
+			Like, err := db.Prepare("DELETE from Likes WHERE post_id=?")
+
+			CheckErr(err)
+
+			res, err = Like.Exec(post_info.ID)
+			CheckErr(err)
+
+			_, err = res.RowsAffected()
+			CheckErr(err)
+
+			Like.Close()
 		}
-	} else {
-		http.Redirect(w, r, "/login", 301)
+		db.Close()
 	}
 }
 
@@ -286,6 +287,8 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 
 	like.Close()
 
+	db.Close()
+
 	//Récupération du nouveau commentaire
 	if r.Method == "POST" {
 		db, _ := sql.Open("sqlite3", "database/database.db")
@@ -310,26 +313,10 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 				}
 				datab.Close()
 			} else {
-				if r.FormValue("Suppr") != "" {
-					fmt.Println("---------- Suppr -----------")
-					upost_id, err := strconv.Atoi(post_id)
-					if userInfo.ID == upost_id {
+				fmt.Println(r.FormValue("deleteButton"))
+				if r.FormValue("deleteButton") != "" {
 
-						CheckErr(err)
-						fmt.Printf("User id : %d", userInfo.ID)
-						stmt, err := db.Prepare("delete from Posts where user_id=? AND post_id=?")
-						CheckErr(err)
-
-						res, err := stmt.Exec(userInfo.ID, upost_id)
-						CheckErr(err)
-
-						_, err = res.RowsAffected()
-						CheckErr(err)
-
-						stmt.Close()
-					} else {
-						fmt.Println("Vous ne pouvez pas supprimer")
-					}
+					DeletePost(post_id, userInfo)
 				} else {
 					if !dejaLike {
 

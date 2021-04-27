@@ -35,6 +35,7 @@ type INFO struct {
 	Msg         string
 	Mod         int
 	Admin       bool
+	Modo        bool
 
 	AllPosts []POSTINFO
 }

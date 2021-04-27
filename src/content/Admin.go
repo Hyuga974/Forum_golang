@@ -16,7 +16,7 @@ func AdminPosts(w http.ResponseWriter, r *http.Request) {
 	files := []string{"template/ModerationPosts.html", "template/Common.html"}
 	var data ALLINFO
 
-	if user.Admin {
+	if user.Admin || user.Modo {
 		color := RandomColor()
 
 		allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
@@ -128,67 +128,6 @@ func AdminPosts(w http.ResponseWriter, r *http.Request) {
 			All_Posts: all_Post,
 		}
 
-		//!POST
-
-		if r.Method == "POST" {
-			postID := r.FormValue("id")
-			var post_id int
-			var title string
-			var categories string
-			var body string
-			var user_id int
-			var image string
-			var likes int
-			var comments_nb int
-			var since string
-
-			db, err := sql.Open("sqlite3", "database/database.db")
-			CheckErr(err)
-			post, err := db.Query("SELECT * FROM Posts WHERE id=" + postID)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-
-			CheckErr(err)
-			for post.Next() {
-				err = post.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb, &since)
-				CheckErr(err)
-			}
-			post.Close()
-
-			post_info := POSTINFO{
-				ID:         post_id,
-				User_ID:    user_id,
-				Title:      title,
-				Body:       body,
-				Image:      image,
-				Likes:      likes,
-				Comment_Nb: comments_nb,
-			}
-
-			if user.ID == post_info.User_ID || user.Admin {
-
-				del, _ := db.Prepare("DELETE from Posts WHERE id=?")
-
-				res, err := del.Exec(strconv.Itoa(post_info.ID))
-				CheckErr(err)
-
-				_, err = res.RowsAffected()
-				CheckErr(err)
-
-				del.Close()
-				http.Redirect(w, r, "/posts", 301)
-				data = ALLINFO{
-					Self_User_Info: user,
-					Post_Info:      post_info,
-				}
-
-				files = []string{"template/EditPost.html", "template/Common.html"}
-			}
-
-			db.Close()
-		}
-
 	} else {
 		files = []string{"template/404.html"}
 		fmt.Println("Redirect")
@@ -212,13 +151,8 @@ func AdminUser(w http.ResponseWriter, r *http.Request) {
 
 	files := []string{"template/ModerationUsers.html", "template/Common.html"}
 	var data ALLINFO
-
-	if user.Admin {
+	if user.Admin || user.Modo {
 		db, err := sql.Open("sqlite3", "database/database.db")
-
-		if r.Method == "POST" {
-
-		}
 
 		users, err := db.Query("SELECT * FROM Users ORDER BY id ASC")
 
@@ -265,4 +199,150 @@ func AdminUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Server Error", 500)
 	}
 
+}
+
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	user := GetSession(r)
+
+	userid := r.FormValue("id")
+	if user.UserName != "" {
+		var username string
+		var email string
+		var since string
+		var description string
+		var password string
+		var image string
+		var country string
+
+		db, err := sql.Open("sqlite3", "database/database.db")
+		CheckErr(err)
+		post, err := db.Query("SELECT * FROM Users WHERE id=" + userid)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		CheckErr(err)
+		for post.Next() {
+			err = post.Scan(&userid, &username, &email, &since, &description, &password, &image, &country)
+			CheckErr(err)
+		}
+		post.Close()
+		userIDInt, _ := strconv.Atoi(userid)
+		userTarget := GetUser(userIDInt)
+
+		if (user.Admin || user.Modo) && !userTarget.Admin {
+
+			del, _ := db.Prepare("DELETE from Users WHERE id=?")
+
+			res, err := del.Exec(userid)
+			CheckErr(err)
+
+			_, err = res.RowsAffected()
+			CheckErr(err)
+
+			del.Close()
+
+			http.Redirect(w, r, "/posts", 301)
+
+		}
+		db.Close()
+	} else {
+		http.Redirect(w, r, "/login", 301)
+	}
+}
+
+func PromoteUser(w http.ResponseWriter, r *http.Request) {
+	user := GetSession(r)
+
+	fmt.Println("Promotion en cours!!!")
+	userid := r.FormValue("id")
+	if user.UserName != "" {
+		var username string
+		var email string
+		var since string
+		var description string
+		var password string
+		var image string
+		var country string
+		var mod int
+
+		db, err := sql.Open("sqlite3", "database/database.db")
+		CheckErr(err)
+		post, err := db.Query("SELECT * FROM Users WHERE id=" + userid)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		CheckErr(err)
+		for post.Next() {
+			err = post.Scan(&userid, &username, &email, &since, &description, &password, &image, &country, &mod)
+			CheckErr(err)
+		}
+		post.Close()
+		userIDInt, _ := strconv.Atoi(userid)
+		userTarget := GetUser(userIDInt)
+
+		if (user.Admin || user.Modo) && !userTarget.Admin {
+			user, _ := db.Prepare("UPDATE Users SET Mod=? WHERE id=" + userid)
+			modo := 1
+			_, err = user.Exec(modo)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			user.Close()
+			http.Redirect(w, r, "/profil?id={{ .User_Info.ID }}", 301)
+
+		}
+		db.Close()
+	} else {
+		http.Redirect(w, r, "/login", 301)
+	}
+}
+
+func DemoteUser(w http.ResponseWriter, r *http.Request) {
+	user := GetSession(r)
+
+	fmt.Println("Relegation en cours!!!")
+	userid := r.FormValue("id")
+	if user.UserName != "" {
+		var username string
+		var email string
+		var since string
+		var description string
+		var password string
+		var image string
+		var country string
+		var mod int
+
+		db, err := sql.Open("sqlite3", "database/database.db")
+		CheckErr(err)
+		post, err := db.Query("SELECT * FROM Users WHERE id=" + userid)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		CheckErr(err)
+		for post.Next() {
+			err = post.Scan(&userid, &username, &email, &since, &description, &password, &image, &country, &mod)
+			CheckErr(err)
+		}
+		post.Close()
+		userIDInt, _ := strconv.Atoi(userid)
+		userTarget := GetUser(userIDInt)
+
+		if (user.Admin || user.Modo) && (!userTarget.Admin && !userTarget.Modo) {
+			user, _ := db.Prepare("UPDATE Users SET Mod=? WHERE id=" + userid)
+			modo := 0
+			_, err = user.Exec(modo)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			user.Close()
+			http.Redirect(w, r, "/profil?id={{ .User_Info.ID }}", 301)
+
+		}
+		db.Close()
+	} else {
+		http.Redirect(w, r, "/login", 301)
+	}
 }

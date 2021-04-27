@@ -18,7 +18,8 @@ func main() {
 	http.HandleFunc("/post", content.OnePost)
 	http.HandleFunc("/newpost", content.CreationPost)
 	http.HandleFunc("/editpost", content.EditPost)
-	http.HandleFunc("/deletepost", content.DeletePost)
+	http.HandleFunc("/deleteuser", content.DeleteUser)
+	http.HandleFunc("/promoteuser", content.PromoteUser)
 	http.HandleFunc("/adminuser", content.AdminUser)
 	http.HandleFunc("/adminpost", content.AdminPosts)
 

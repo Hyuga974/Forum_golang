@@ -18,7 +18,7 @@
         <p style="float:right"> <input name="Liker" type="checkbox" id="checkbox" {{ .Currently_Post_Like }} onchange="submit()" />
             <label for="checkbox">
         
-        <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
+        <svg id="heart-svg" name="Like" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
           <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
             <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
             <circle id="main-circ" fill="#E2264D" opacity="0" cx="20.5" cy="20.5" r="1.5"/>
@@ -105,7 +105,8 @@
     {{ end }}
 </div>
 
-<!-- Modal -->
+<!-- Delete Modal -->
+<form method="POST">
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -118,12 +119,13 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-          <a type="button" href="/deletepost?id={{ .Post_Info.ID }}"  type="button" class="btn btn-danger">Supprimer</a>
+          <button type="button" name="deleteButton" onclick="submit()" value="pinetamere" class="btn btn-danger">Supprimer</button>
         </div>
       </div>
     </div>
   </div>
-
+</form>
+<!-- Signal Modal -->
 <div class="modal fade" id="signalModal" tabindex="-1" aria-labelledby="signalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

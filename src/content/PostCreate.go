@@ -24,8 +24,6 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 		color := RandomColor()
 
 		//sport, anime/manga, economie, jeux vidéo, informatique, voyages, NEW, paranormal.
-		allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
-		tabCategories := strings.Split(allCategories, ";")
 
 		db, err := sql.Open("sqlite3", "database/database.db")
 		CheckErr(err)
@@ -70,10 +68,14 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 			pretime := time.Now().In(loc)
 			since := pretime.String()[:19]
 			var categoriesCheck string
-			for _, categorie := range tabCategories {
+			for categorie := range color {
 				if r.FormValue(categorie) != "" {
 					categoriesCheck += categorie + ";"
 				}
+			}
+
+			if categoriesCheck == "" {
+				categoriesCheck += "autre;"
 			}
 
 			if title != "" && body != "" && categoriesCheck != "" {
@@ -93,7 +95,7 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 					}
 					tabCat = append(tabCat, oneCategorie)
 				}
-				for _, x := range tabCategories {
+				for x := range color {
 					oneCategorie := CATEGORIES{
 						Cat:   x,
 						Color: color[x],
@@ -127,7 +129,7 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/post?id="+id, 301)
 			}
 		} else {
-			for _, x := range tabCategories {
+			for x := range color {
 				oneCategorie := CATEGORIES{
 					Cat:   x,
 					Color: color[x],
@@ -140,7 +142,7 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 		}
 		data := ALLINFO{
 			Self_User_Info: user,
-			Post_Info: Post,
+			Post_Info:      Post,
 		}
 
 		files := []string{"template/CreatePost.html", "template/Common.html"}

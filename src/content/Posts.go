@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -12,11 +13,15 @@ import (
 func AllPosts(w http.ResponseWriter, r *http.Request) {
 	user := GetSession(r)
 	color := RandomColor()
-
-	allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
-	tabCategories := strings.Split(allCategories, ";")
+	fmt.Println(color)
 	var tabCat []CATEGORIES
-	for _, x := range tabCategories {
+	var tabATrier []string
+	for x := range color {
+		fmt.Println(x)
+		tabATrier = append(tabATrier, x)
+	}
+	sort.Strings(tabATrier)
+	for _, x := range tabATrier {
 		oneCategorie := CATEGORIES{
 			Cat:   x,
 			Color: color[x],
@@ -31,7 +36,7 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 
 	categorie := ""
 	if r.Method == "POST" {
-		for _, x := range tabCategories {
+		for x := range color {
 			if r.FormValue(x) != "" {
 				categorie = x
 			}

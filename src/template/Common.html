@@ -27,17 +27,28 @@ ete{{ define "main" }}
                             <a class="nav-link text-white" href="/posts">Posts</a>
                         </li>
                     </ul>
+                    {{ if .Self_User_Info.Admin}}
                     <li class="nav-item dropdown d-flex" style="margin-right: 1%;">
                         <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-shield-alt"></i>
                         </a>
-                        {{ if .Self_User_Info.Admin}}
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="/adminuser" value="self">Contrôle des profils</a></li>
-                                <li><a class="dropdown-item" href="/adminpost" value="self">Contrôle des Posts</a></li>
-                            </ul>
-                        {{ end }}
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/adminuser" value="self">Contrôle des profils</a></li>
+                            <li><a class="dropdown-item" href="/adminpost" value="self">Contrôle des Posts</a></li>
+                        </ul>
                     </li>
+                    {{ end }}
+                    {{ if .Self_User_Info.Modo}}
+                    <li class="nav-item dropdown d-flex" style="margin-right: 1%;">
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-shield-alt"></i>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/adminuser" value="self">Contrôle des profils</a></li>
+                            <li><a class="dropdown-item" href="/adminpost" value="self">Contrôle des Posts</a></li>
+                        </ul>
+                    </li>
+                    {{ end }}
                     <li class="nav-item dropdown d-flex" style="margin-right: 6%;">
                         <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                              {{ if .Self_User_Info.Login }}

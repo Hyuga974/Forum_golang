@@ -20,7 +20,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	msg := " "
 	allcountry := getPays()
 	if r.Method == "POST" {
-		datab, err := db.Prepare("INSERT INTO Users (username, email, since, description, password, image, country) VALUES (?, ?, ?, ?, ?, ?, ?)")
+		datab, err := db.Prepare("INSERT INTO Users (username, email, since, description, password, image, country, mod) VALUES (?, ?, ?, ?, ?, ?, ?,?)")
 		if err != nil {
 			fmt.Println(err)
 			http.Error(w, "Server Error", 500)
@@ -34,6 +34,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("password")
 		image := "https://i.imgur.com/pMtf7R9.png"
 		country := r.FormValue("country")
+		mod := 0
 		confirm := r.FormValue("psw-confirmation")
 		Crypted := []byte(password)
 		Crypted, _ = bcrypt.GenerateFromPassword(Crypted, 10)
@@ -43,7 +44,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			if password != confirm {
 				msg = "Les deux mots de passe ne sont pas identiques"
 			} else {
-				_, err := datab.Exec(username, email, since, description, Crypted, image, country)
+				_, err := datab.Exec(username, email, since, description, Crypted, image, country, mod)
 				if err != nil {
 					if err.Error() == "UNIQUE constraint failed: Users.email" {
 						msg = "Cet E-Mail est déjà utilisé par un autre utilisateur"
@@ -62,8 +63,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := ALLINFO{
-		Self_User_Info:   Info,
-		All_Country: allcountry,
+		Self_User_Info: Info,
+		All_Country:    allcountry,
 	}
 
 	files := []string{"template/Register.html", "template/Common.html"}

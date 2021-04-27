@@ -37,7 +37,7 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 		for verifID.Next() {
 			err := verifID.Scan(&id, &username, &email, &since, &description, &password, &image, &country, &mod)
 			CheckErr(err)
-			modB := IntToBool(mod)
+			modB := IntToBoolAdmin(mod)
 			verifInfo := INFO{
 				ID:          id,
 				Email:       email,
@@ -202,7 +202,7 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		itsyou = true
-		//Récupèrelast post
+		//Récupère last post
 		lastpost, err := db.Query("SELECT * FROM Posts where user_id=" + strconv.Itoa(user.ID) + " ORDER BY id DESC LIMIT 1")
 		if err != nil {
 			fmt.Println(err.Error())

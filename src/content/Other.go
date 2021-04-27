@@ -121,6 +121,7 @@ func GetSession(r *http.Request) INFO {
 					Image:       user.Image,
 					Country:     user.Country,
 					Admin:       user.Admin,
+					Modo:        user.Modo,
 					Login:       true,
 					AllPosts:    posts,
 				}
@@ -175,7 +176,8 @@ func GetUser(id int) INFO {
 		}
 	}
 
-	admin := IntToBool(userinfo.Mod)
+	admin := IntToBoolAdmin(userinfo.Mod)
+	modo := IntToBoolModo(userinfo.Mod)
 
 	userinfo = INFO{
 		ID:          id,
@@ -187,6 +189,7 @@ func GetUser(id int) INFO {
 		Image:       image,
 		Country:     country,
 		Admin:       admin,
+		Modo:        modo,
 		AllPosts:    userAllPost,
 	}
 	tabusers.Close()
@@ -194,13 +197,22 @@ func GetUser(id int) INFO {
 	return userinfo
 }
 
-func IntToBool(mod int) bool {
+func IntToBoolAdmin(mod int) bool {
+	if mod == 2 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func IntToBoolModo(mod int) bool {
 	if mod == 1 {
 		return true
 	} else {
 		return false
 	}
 }
+
 func GetPost(user INFO) []POSTINFO {
 	var all_Post []POSTINFO
 	db, err := sql.Open("sqlite3", "database/database.db")
@@ -275,14 +287,16 @@ func String(u uuid.UUID) string {
 
 func RandomColor() map[string]string {
 	allColor := map[string]string{
-		"informatique": "#19A9D1",
 		"anime/manga":  "#D50C2E",
-		"jeux vidéos":  "#23C009",
-		"sport":        "#9D84C9",
+		"autre":        "#ccd1d1",
+		"culture":      "#E15256",
 		"economie":     "#C3C020",
-		"voyage":       "#00FF12",
-		"NEWS":         "#CDC8C6",
+		"informatique": "#19A9D1",
+		"jeux vidéos":  "#23C009",
+		"NEWS":         "#ff5733",
 		"paranormal":   "#070709",
+		"sport":        "#9D84C9",
+		"voyage":       "#00FF12",
 	}
 	return allColor
 }
