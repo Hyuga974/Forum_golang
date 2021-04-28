@@ -38,7 +38,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		confirm := r.FormValue("psw-confirmation")
 		Crypted := []byte(password)
 		Crypted, _ = bcrypt.GenerateFromPassword(Crypted, 10)
-		fmt.Printf("Username : %s ; Email: %s; Country: %s;", username, email, country)
 
 		if username != "" || email != "" || password != "" {
 			if password != confirm {
@@ -51,10 +50,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 					} else if err.Error() == "UNIQUE constraint failed: Users.username" {
 						msg = "Ce nom est déjà utilisé par un autre utilisateur"
 					} else {
-						fmt.Println(err.Error())
-						http.Redirect(w, r, "/login", 301)
+					fmt.Println(err.Error())
 					}
 				}
+				
+				fmt.Println("Normalement vers Login")
+				http.Redirect(w, r, "/login", 301)
 			}
 		}
 	}

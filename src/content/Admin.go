@@ -200,10 +200,10 @@ func AdminUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	user := GetSession(r)
+func DeleteUser(userid string, user INFO) {
 
-	userid := r.FormValue("id")
+	fmt.Println("1")
+
 	if user.UserName != "" {
 		var username string
 		var email string
@@ -212,25 +212,27 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		var password string
 		var image string
 		var country string
+		var mod int
 
+		fmt.Println("2")
 		db, err := sql.Open("sqlite3", "database/database.db")
 		CheckErr(err)
-		post, err := db.Query("SELECT * FROM Users WHERE id=" + userid)
+		row, err := db.Query("SELECT * FROM Users WHERE id=" + userid)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-
+fmt.Println("3")
 		CheckErr(err)
-		for post.Next() {
-			err = post.Scan(&userid, &username, &email, &since, &description, &password, &image, &country)
+		for row.Next() {
+			err = row.Scan(&userid, &username, &email, &since, &description, &password, &image, &country, &mod)
 			CheckErr(err)
 		}
-		post.Close()
+		row.Close()
 		userIDInt, _ := strconv.Atoi(userid)
 		userTarget := GetUser(userIDInt)
 
 		if (user.Admin || user.Modo) && !userTarget.Admin {
-
+			fmt.Println("4")
 			del, _ := db.Prepare("DELETE from Users WHERE id=?")
 
 			res, err := del.Exec(userid)
@@ -241,12 +243,23 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 			del.Close()
 
-			http.Redirect(w, r, "/posts", 301)
+			fmt.Println("5")
+			post, err := db.Prepare("DELETE from Posts WHERE user_id=?")
+
+			CheckErr(err)
+
+			res, err = post.Exec(userid)
+			CheckErr(err)
+
+			_, err = res.RowsAffected()
+			CheckErr(err)
+
+			post.Close()
+			
+			fmt.Println("7")
 
 		}
 		db.Close()
-	} else {
-		http.Redirect(w, r, "/login", 301)
 	}
 }
 

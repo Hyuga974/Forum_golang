@@ -5,8 +5,12 @@
         <!-- CATEGORIE -->
         <div class="dropdown">
             <i class="fas fa-ellipsis-v mt-1" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float:right; margin-left: 10px;"></i>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">{{ if .Post_Info.Deletable }}
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {{ if .Post_Info.Deletable}}
                 <a class="dropdown-item" href="/editpost?id={{ .Post_Info.ID }}">Modifier le post</a>
+                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" style="color:red">Supprimer le post</a>
+                <hr class="dropdown-divider"> {{ end }}
+                {{ if .Self_User_Info.Admin }}
                 <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" style="color:red">Supprimer le post</a>
                 <hr class="dropdown-divider"> {{ end }}
                 <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#signalModal">Signaler</a>

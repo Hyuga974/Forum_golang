@@ -300,3 +300,92 @@ func RandomColor() map[string]string {
 	}
 	return allColor
 }
+
+
+func SearchData(SearchCriteria string) []int {
+	db, err := sql.Open("sqlite3", "database/database.db")
+	CheckErr(err)
+
+	var allUsers []INFO
+
+	users, err := db.Query("SELECT * FROM Users ORDER BY id DESC")
+
+	var currentlyUser INFO
+	var email string
+	var password string
+	var username string
+	var description string
+	var country string
+	var mod int
+	var id int
+	var image string
+	var since string
+	for users.Next() {
+		err = users.Scan(&id, &username, &email, &since, &description, &password, &image, &country, &mod)
+		CheckErr(err)
+		currentlyUser = GetUser(id)
+		allUsers = append(allUsers, currentlyUser)
+	}
+	users.Close()
+
+
+	posts, _ := db.Query("SELECT * FROM Posts WHERE title LIKE '%"+SearchCriteria +"%'")
+
+	color := RandomColor()
+	var all_Post []POSTINFO
+	var user_id int
+	var title string
+	var body string
+	var likes int
+	var comment_nb int
+	var categories string
+	var userinfo INFO
+	for posts.Next() {
+		err = posts.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
+		CheckErr(err)
+		cat := strings.Split(categories, ";")
+		var tabCategories []CATEGORIES
+		for _, x := range cat {
+			catephemere := CATEGORIES{
+				Cat:   x,
+				Color: color[x],
+			}
+			tabCategories = append(tabCategories, catephemere)
+		}
+			userinfo = GetUser(user_id)
+
+			post_info := POSTINFO{
+				ID:         id,
+				User_ID:    user_id,
+				Title:      title,
+				Body:       body,
+				Image:      image,
+				Categories: tabCategories,
+				Likes:      likes,
+				Comment_Nb: comment_nb,
+
+				Post_User_Info: userinfo,
+			}
+			all_Post = append(all_Post, post_info)
+
+	}
+	posts.Close()
+
+
+
+	db.Close()
+
+
+
+    var res []int
+    // SearchCriteria = strings.ToLower(SearchCriteria)
+
+    // for i, artist := range artistData {
+    //     if strings.Contains(strings.ToLower(artist.Name), SearchCriteria) {
+    //         res = append(res, i)
+    //         continue
+    //     }
+
+    // }
+    return res
+}

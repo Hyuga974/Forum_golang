@@ -340,14 +340,17 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		fmt.Println(r.FormValue("takeOut"))
 		fmt.Println(r.FormValue("take"))
+		fmt.Println(r.FormValue("delete"))
 		if r.FormValue("takeOut")== "retrograde"{
 			DemoteUser(userID, user)
-			path:="/profil?id=" + userID
-			fmt.Println(path)
+			path:="/profil?ID=" + userID
 			http.Redirect(w,r,path, 302)
 		}else if r.FormValue("take")=="promouvoir"{
 			PromoteUser(userID, user)
-			http.Redirect(w,r,"/profil", 301)
+			http.Redirect(w,r,"/profil?ID="+userID, 301)
+		}else if r.FormValue("delete")=="suppression"{
+			DeleteUser(userID, user)
+			http.Redirect(w,r,"/adminuser", 303)
 		}else{
 			r.ParseMultipartForm(10 << 20) //max size 10Mb (5mb for the pf)
 			old_Description := user.Description
