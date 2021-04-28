@@ -338,77 +338,90 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "POST" {
-		r.ParseMultipartForm(10 << 20) //max size 10Mb (5mb for the pf)
-		old_Description := user.Description
-		old_Username := user.UserName
-		old_Country := user.Country
-		old_Image := user.Image
-		var new_Username string
-		var new_Description string
-		var new_Country string
-		var new_Image string
-		if r.FormValue("Username") != "" {
-			new_Username = r.FormValue("Username")
-		} else {
-			new_Username = old_Username
-		}
-		if r.FormValue("Description") != "" {
-			new_Description = r.FormValue("Description")
-		} else {
-			new_Description = old_Description
-		}
-
-		if r.FormValue("country") != "" {
-			new_Country = r.FormValue("country")
-		} else {
-			new_Country = old_Country
-		}
-
-		file, handler, err := r.FormFile("myFile")
-		if err != nil {
-			fmt.Println(err)
-			new_Image = old_Image
-		} else {
-			defer file.Close()
-			fmt.Printf("Uploaded File: %+v\n", strings.ReplaceAll(handler.Filename, " ", "-"))
-			fmt.Printf("File Size: %+v\n", handler.Size)
-			fmt.Printf("MIME Header: %+v\n", handler.Header)
-
-			/*
-				buff := make([]byte, 512)
-				_, err = file.Read(buff)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-
-				filetype := http.DetectContentType(buff)
-				if filetype != "image/jpeg" && filetype != "image/png" && filetype != "image/gif" {
-					http.Error(w, "The provided file format is not allowed. Please upload a JPEG or PNG or GIF image", http.StatusBadRequest)
-					return
-				}
-			*/
-
-			absPath, _ := filepath.Abs("../src/assets/profiles/" + strings.ReplaceAll(handler.Filename, " ", "-"))
-
-			resFile, err := os.Create(absPath)
-			if err != nil {
-				fmt.Print(w, err)
+		fmt.Println(r.FormValue("takeOut"))
+		fmt.Println(r.FormValue("take"))
+		if r.FormValue("takeOut")== "retrograde"{
+			DemoteUser(userID, user)
+			path:="/profil?id=" + userID
+			fmt.Println(path)
+			http.Redirect(w,r,path, 302)
+		}else if r.FormValue("take")=="promouvoir"{
+			PromoteUser(userID, user)
+			http.Redirect(w,r,"/profil", 301)
+		}else{
+			r.ParseMultipartForm(10 << 20) //max size 10Mb (5mb for the pf)
+			old_Description := user.Description
+			old_Username := user.UserName
+			old_Country := user.Country
+			old_Image := user.Image
+			var new_Username string
+			var new_Description string
+			var new_Country string
+			var new_Image string
+			if r.FormValue("Username") != "" {
+				new_Username = r.FormValue("Username")
+			} else {
+				new_Username = old_Username
 			}
-			defer resFile.Close()
+			if r.FormValue("Description") != "" {
+				new_Description = r.FormValue("Description")
+			} else {
+				new_Description = old_Description
+			}
 
-			io.Copy(resFile, file)
-			defer resFile.Close()
-			fmt.Print("File uploaded")
+			if r.FormValue("country") != "" {
+				new_Country = r.FormValue("country")
+			} else {
+				new_Country = old_Country
+			}
 
-			new_Image = "../assets/profiles/" + strings.ReplaceAll(handler.Filename, " ", "-")
+			file, handler, err := r.FormFile("myFile")
+			if err != nil {
+				fmt.Println(err)
+				new_Image = old_Image
+			} else {
+				defer file.Close()
+				fmt.Printf("Uploaded File: %+v\n", strings.ReplaceAll(handler.Filename, " ", "-"))
+				fmt.Printf("File Size: %+v\n", handler.Size)
+				fmt.Printf("MIME Header: %+v\n", handler.Header)
+
+				/*
+					buff := make([]byte, 512)
+					_, err = file.Read(buff)
+					if err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+
+					filetype := http.DetectContentType(buff)
+					if filetype != "image/jpeg" && filetype != "image/png" && filetype != "image/gif" {
+						http.Error(w, "The provided file format is not allowed. Please upload a JPEG or PNG or GIF image", http.StatusBadRequest)
+						return
+					}
+				*/
+
+				absPath, _ := filepath.Abs("../src/assets/profiles/" + strings.ReplaceAll(handler.Filename, " ", "-"))
+
+				resFile, err := os.Create(absPath)
+				if err != nil {
+					fmt.Print(w, err)
+				}
+				defer resFile.Close()
+
+				io.Copy(resFile, file)
+				defer resFile.Close()
+				fmt.Print("File uploaded")
+
+				new_Image = "../assets/profiles/" + strings.ReplaceAll(handler.Filename, " ", "-")
+			}
+			datab, err := db.Prepare("UPDATE Users SET username=?, description=?, country=?, image=? WHERE id=" + strconv.Itoa(user.ID))
+			CheckErr(err)
+			datab.Exec(new_Username, new_Description, new_Country, new_Image)
+			datab.Close()
+
+			user = GetSession(r)
 		}
-		datab, err := db.Prepare("UPDATE Users SET username=?, description=?, country=?, image=? WHERE id=" + strconv.Itoa(user.ID))
-		CheckErr(err)
-		datab.Exec(new_Username, new_Description, new_Country, new_Image)
-		datab.Close()
-
-		user = GetSession(r)
+		
 	}
 
 	allcountry := getPays()

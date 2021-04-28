@@ -255,6 +255,7 @@
 </div>
 
 <!-- Modal De Confirmation Promouvoir profil -->
+<form method="POST">
 <div class="modal fade" id="promModal" tabindex="-1" aria-labelledby="promModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -267,13 +268,15 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                <a type="submit" class="btn btn-success" href="/promoteuser?id={{ .User_Info.ID }}" >Promouvoir</a>
+                <button type="submit" name="take" onclick="submit()" value="promouvoir"  class="btn btn-success">Promouvoir</button>
             </div>
         </div>
     </div>
 </div>
+</form>
 
 <!-- Modal De Confirmation DéPromotion de Profil -->
+<form method="POST">
 <div class="modal fade" id="depromModal" tabindex="-1" aria-labelledby="depromModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -286,11 +289,12 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                <a type="submit" class="btn btn-danger" href="/depromuser?id={{ .User_Info.ID }}" >Retirer les droits</a>
+                <button type="submit" name="takeOut" onclick="submit()" value="retrograde"  class="btn btn-danger">Retirer les droits</button>
             </div>
         </div>
     </div>
 </div>
+</form>
 {{ end }}
 
 <script src="../assets/main.js"></script>

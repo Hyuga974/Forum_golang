@@ -18,11 +18,8 @@ func AdminPosts(w http.ResponseWriter, r *http.Request) {
 
 	if user.Admin || user.Modo {
 		color := RandomColor()
-
-		allCategories := "sport;anime/manga;jeux vidéos;informatique;economie;voyage;NEWS;paranormal"
-		tabCategories := strings.Split(allCategories, ";")
 		var tabCat []CATEGORIES
-		for _, x := range tabCategories {
+		for x := range color {
 			oneCategorie := CATEGORIES{
 				Cat:   x,
 				Color: color[x],
@@ -37,11 +34,14 @@ func AdminPosts(w http.ResponseWriter, r *http.Request) {
 
 		categorie := ""
 		if r.Method == "POST" {
-			for _, x := range tabCategories {
+			for x := range color {
 				if r.FormValue(x) != "" {
 					categorie = x
 				}
 			}
+			if r.FormValue("deleteButton") != ""{
+				DeletePost(r.FormValue("deleteButton"), user)
+			}		
 
 		}
 		post, _ := db.Query("SELECT * FROM Posts ORDER BY id DESC")
@@ -130,7 +130,6 @@ func AdminPosts(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		files = []string{"template/404.html"}
-		fmt.Println("Redirect")
 	}
 	tmp, err := template.ParseFiles(files...)
 	if err != nil {
@@ -251,11 +250,9 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func PromoteUser(w http.ResponseWriter, r *http.Request) {
-	user := GetSession(r)
+func PromoteUser(id string, user INFO) {
 
 	fmt.Println("Promotion en cours!!!")
-	userid := r.FormValue("id")
 	if user.UserName != "" {
 		var username string
 		var email string
@@ -268,42 +265,37 @@ func PromoteUser(w http.ResponseWriter, r *http.Request) {
 
 		db, err := sql.Open("sqlite3", "database/database.db")
 		CheckErr(err)
-		post, err := db.Query("SELECT * FROM Users WHERE id=" + userid)
+		post, err := db.Query("SELECT * FROM Users WHERE id=" + id)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
 
 		CheckErr(err)
 		for post.Next() {
-			err = post.Scan(&userid, &username, &email, &since, &description, &password, &image, &country, &mod)
+			err = post.Scan(&id, &username, &email, &since, &description, &password, &image, &country, &mod)
 			CheckErr(err)
 		}
 		post.Close()
-		userIDInt, _ := strconv.Atoi(userid)
+		userIDInt, _ := strconv.Atoi(id)
 		userTarget := GetUser(userIDInt)
 
-		if (user.Admin || user.Modo) && !userTarget.Admin {
-			user, _ := db.Prepare("UPDATE Users SET Mod=? WHERE id=" + userid)
+		if (user.Admin || user.Modo) && (!userTarget.Admin) {
+			user, _ := db.Prepare("UPDATE Users SET Mod=? WHERE id=" + id)
 			modo := 1
 			_, err = user.Exec(modo)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
 			user.Close()
-			http.Redirect(w, r, "/profil?id={{ .User_Info.ID }}", 301)
 
 		}
 		db.Close()
-	} else {
-		http.Redirect(w, r, "/login", 301)
-	}
+	} 
 }
 
-func DemoteUser(w http.ResponseWriter, r *http.Request) {
-	user := GetSession(r)
+func DemoteUser(id string, user INFO) {
 
 	fmt.Println("Relegation en cours!!!")
-	userid := r.FormValue("id")
 	if user.UserName != "" {
 		var username string
 		var email string
@@ -316,33 +308,30 @@ func DemoteUser(w http.ResponseWriter, r *http.Request) {
 
 		db, err := sql.Open("sqlite3", "database/database.db")
 		CheckErr(err)
-		post, err := db.Query("SELECT * FROM Users WHERE id=" + userid)
+		post, err := db.Query("SELECT * FROM Users WHERE id=" + id)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
 
 		CheckErr(err)
 		for post.Next() {
-			err = post.Scan(&userid, &username, &email, &since, &description, &password, &image, &country, &mod)
+			err = post.Scan(&id, &username, &email, &since, &description, &password, &image, &country, &mod)
 			CheckErr(err)
 		}
 		post.Close()
-		userIDInt, _ := strconv.Atoi(userid)
+		userIDInt, _ := strconv.Atoi(id)
 		userTarget := GetUser(userIDInt)
 
-		if (user.Admin || user.Modo) && (!userTarget.Admin && !userTarget.Modo) {
-			user, _ := db.Prepare("UPDATE Users SET Mod=? WHERE id=" + userid)
+		if (user.Admin || user.Modo) && (!userTarget.Admin) {
+			user, _ := db.Prepare("UPDATE Users SET Mod=? WHERE id=" + id)
 			modo := 0
 			_, err = user.Exec(modo)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
 			user.Close()
-			http.Redirect(w, r, "/profil?id={{ .User_Info.ID }}", 301)
 
 		}
 		db.Close()
-	} else {
-		http.Redirect(w, r, "/login", 301)
-	}
+	} 
 }

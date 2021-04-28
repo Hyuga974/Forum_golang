@@ -1,4 +1,5 @@
 {{ template "main" . }} {{ define "body" }}
+<form method="POST">
 <div class="container">
     <h1 class="mt-4" style="text-align: center;"><i class="fas fa-angle-double-right"></i> Panneau de contrôle des posts <i class="fas fa-angle-double-left"></i></h1>
     <div class="row row-cols-1 g-3 mt-3" style="margin: 0px 100px">
@@ -37,7 +38,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <a type="button" class="btn btn-danger" href="/deletepost?id={{ $post.ID }}">Supprimer</a>
+                            <button type="submit" name="deleteButton" onclick="submit()" value="{{ $post.ID }}"  class="btn btn-danger">Supprimer</button>
                         </div>
                     </div>
                 </div>
@@ -45,7 +46,7 @@
         {{end}}
     </div>
 </div>
-
+</form>
 
 <!-- Modal script -->
 <script>

@@ -18,8 +18,6 @@ func main() {
 	http.HandleFunc("/post", content.OnePost)
 	http.HandleFunc("/newpost", content.CreationPost)
 	http.HandleFunc("/editpost", content.EditPost)
-	http.HandleFunc("/deleteuser", content.DeleteUser)
-	http.HandleFunc("/promoteuser", content.PromoteUser)
 	http.HandleFunc("/adminuser", content.AdminUser)
 	http.HandleFunc("/adminpost", content.AdminPosts)
 
@@ -27,6 +25,6 @@ func main() {
 	http.HandleFunc("/login", content.Login)
 	http.HandleFunc("/register", content.Register)
 	fmt.Println("Start... ")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":4444", nil)
 
 }

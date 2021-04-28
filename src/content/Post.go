@@ -317,6 +317,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 				if r.FormValue("deleteButton") != "" {
 
 					DeletePost(post_id, userInfo)
+					http.Redirect(w,r,"/posts", 301)
 				} else {
 					if !dejaLike {
 
