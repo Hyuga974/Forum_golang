@@ -13,18 +13,16 @@ import (
 func AllPosts(w http.ResponseWriter, r *http.Request) {
 	user := GetSession(r)
 	color := RandomColor()
-	fmt.Println(color)
 	var tabCat []CATEGORIES
 	var tabATrier []string
-	for x := range color {
-		fmt.Println(x)
-		tabATrier = append(tabATrier, x)
+	for categorie := range color {
+		tabATrier = append(tabATrier, categorie)
 	}
 	sort.Strings(tabATrier)
-	for _, x := range tabATrier {
+	for _, categorie := range tabATrier {
 		oneCategorie := CATEGORIES{
-			Cat:   x,
-			Color: color[x],
+			Cat:   categorie,
+			Color: color[categorie],
 		}
 		tabCat = append(tabCat, oneCategorie)
 	}
@@ -34,97 +32,102 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 
 	db, err := sql.Open("sqlite3", "database/database.db")
 
-	categorie := ""
+	categorieCheck := ""
+	var result ALLINFO
+	var searching = false
 	if r.Method == "POST" {
-		for x := range color {
-			if r.FormValue(x) != "" {
-				categorie = x
+		if r.FormValue("search") != ""{
+			result = SearchData(r.FormValue("search"))
+			searching = true
+		}else{
+			for categorie := range color {
+				if r.FormValue(categorie) != "" {
+					categorieCheck = categorie
+				}
 			}
 		}
 
-	}
-	post, err := db.Query("SELECT * FROM Posts ORDER BY id DESC")
 
-	var since string
-	var id int
-	var user_id int
-	var title string
-	var body string
-	var image string
-	var likes int
-	var comment_nb int
-	var categories string
-	var userinfo INFO
-	for post.Next() {
-		err = post.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
-		CheckErr(err)
-		cat := strings.Split(categories, ";")
-		var tabCategories []CATEGORIES
-		for _, x := range cat {
-			catephemere := CATEGORIES{
-				Cat:   x,
-				Color: color[x],
-			}
-			tabCategories = append(tabCategories, catephemere)
+	}
+	var data ALLINFO
+	if searching{
+		postInfo := POSTINFO{
+			AllCategories: tabCat,
 		}
-		catCheck := false
-		for _, y := range tabCategories {
-			if y.Cat == categorie {
-				catCheck = true
-				continue
-			}
+	
+		data = ALLINFO{
+			Self_User_Info: user,
+			Post_Info:      postInfo,
+	
+			All_User:  result.All_User,
+			All_Posts: result.All_Posts,
 		}
-		if catCheck == true {
-			userinfo = GetUser(user_id)
+	}else{
+		post, err := db.Query("SELECT * FROM Posts ORDER BY id DESC")
 
-			post_info = POSTINFO{
-				ID:         id,
-				User_ID:    user_id,
-				Title:      title,
-				Body:       body,
-				Image:      image,
-				Categories: tabCategories,
-				Likes:      likes,
-				Comment_Nb: comment_nb,
-
-				Post_User_Info: userinfo,
+		var since string
+		var id int
+		var user_id int
+		var title string
+		var body string
+		var image string
+		var likes int
+		var comment_nb int
+		var categories string
+		var userinfo INFO
+		for post.Next() {
+			err = post.Scan(&id, &title, &categories, &body, &user_id, &image, &likes, &comment_nb, &since)
+			CheckErr(err)
+			cat := strings.Split(categories, ";")
+			var tabCategories []CATEGORIES
+			for _, x := range cat {
+				catephemere := CATEGORIES{
+					Cat:   x,
+					Color: color[x],
+				}
+				tabCategories = append(tabCategories, catephemere)
 			}
-			all_Post = append(all_Post, post_info)
+			catCheck := false
+			for _, y := range tabCategories {
+				if y.Cat == categorieCheck {
+					catCheck = true
+					continue
+				}
+			}
+			if catCheck == true {
+				userinfo = GetUser(user_id)
+
+				post_info = POSTINFO{
+					ID:         id,
+					User_ID:    user_id,
+					Title:      title,
+					Body:       body,
+					Image:      image,
+					Categories: tabCategories,
+					Likes:      likes,
+					Comment_Nb: comment_nb,
+
+					Post_User_Info: userinfo,
+				}
+				all_Post = append(all_Post, post_info)
+			}
+
+		}
+		post.Close()
+
+		db.Close()
+
+		postInfo := POSTINFO{
+			AllCategories: tabCat,
 		}
 
-	}
-	post.Close()
-	var allUsers []INFO
+		data = ALLINFO{
+			Self_User_Info: user,
+			Post_Info:      postInfo,
 
-	users, err := db.Query("SELECT * FROM Users ORDER BY id DESC")
-
-	var currentlyUser INFO
-	var email string
-	var password string
-	var username string
-	var description string
-	var country string
-	var mod int
-	for users.Next() {
-		err = users.Scan(&id, &username, &email, &since, &description, &password, &image, &country, &mod)
-		CheckErr(err)
-		currentlyUser = GetUser(id)
-		allUsers = append(allUsers, currentlyUser)
-	}
-	users.Close()
-
-	db.Close()
-
-	postInfo := POSTINFO{
-		AllCategories: tabCat,
-	}
-
-	data := ALLINFO{
-		Self_User_Info: user,
-		Post_Info:      postInfo,
-
-		All_User:  allUsers,
-		All_Posts: all_Post,
+			All_User:  result.All_User,
+			All_Posts: all_Post,
+		}
 	}
 
 	files := []string{"template/Posts.html", "template/Common.html"}
