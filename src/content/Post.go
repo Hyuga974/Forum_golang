@@ -230,10 +230,10 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 
 	tabCategories := strings.Split(categories, ";")
 	var tabCat []CATEGORIES
-	for _, x := range tabCategories {
+	for _, categorie := range tabCategories {
 		oneCategorie := CATEGORIES{
-			Cat:   x,
-			Color: color[x],
+			Cat:   categorie,
+			Color: color[categorie],
 		}
 		tabCat = append(tabCat, oneCategorie)
 	}

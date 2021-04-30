@@ -96,10 +96,10 @@ func SearchData(search string) ALLINFO{
 		CheckErr(err)
 		cat := strings.Split(categories, ";")
 		var tabCategories []CATEGORIES
-		for _, x := range cat {
+		for _, onecategorie := range cat {
 			catephemere := CATEGORIES{
-				Cat:   x,
-				Color: color[x],
+				Cat:   onecategorie,
+				Color: color[onecategorie],
 			}
 			tabCategories = append(tabCategories, catephemere)
 		}
