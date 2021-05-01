@@ -554,3 +554,52 @@ a.custom-card:hover {
 .navbar-brand {
     font-family: 'Yatra One', cursive;
 }
+
+/* ------------- Radio Comment ---------*/
+
+.comment-button {
+    list-style-type: none;
+    margin: 25px 0 0 0;
+    padding: 0;
+    
+    width: 50%;
+    height: 50%;
+  }
+  
+  .comment-button li {
+    float: left;
+    margin: 0 5px 0 0;
+    width: 100px;
+    height: 40px;
+    position: relative;
+  }
+  
+  .comment-button label,
+  .comment-button input {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  
+  .comment-button input[type="radio"] {
+    opacity: 0.01;
+    z-index: 100;
+  }
+  
+  .comment-button input[type="radio"]:checked+label,
+  .Checked+label {
+    background: yellow;
+  }
+  
+  .comment-button label {
+    padding: 5px;
+    border: 1px solid #CCC;
+    cursor: pointer;
+  }
+  
+  .comment-button label:hover {
+    background: #DDD;
+  }

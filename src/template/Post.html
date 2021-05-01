@@ -1,16 +1,19 @@
  {{ template "main" . }} {{ define "body" }}
 
-<form method="POST" class="needs-validation" novalidate>
+<form method="POST" class="needs-validation" novalidate id="coucou">
     <div class="border border-secondary container rounded-3 pl-2 pr-2 pb-2 mt-5">
         <!-- CATEGORIE -->
         <div class="dropdown">
             <i class="fas fa-ellipsis-v mt-1" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float:right; margin-left: 10px;"></i>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            {{ if .Post_Info.Deletable}}
-                <a class="dropdown-item" href="/editpost?id={{ .Post_Info.ID }}">Modifier le post</a>
+            {{ if .Self_User_Info.Admin }}
                 <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" style="color:red">Supprimer le post</a>
-                <hr class="dropdown-divider"> {{ end }}
-                {{ if .Self_User_Info.Admin }}
+                <hr class="dropdown-divider"> 
+            {{ else if .Self_User_Info.Modo }}
+                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" style="color:red">Supprimer le post</a>
+                <hr class="dropdown-divider"> 
+            {{ else if .Post_Info.Deletable }}
+                <a class="dropdown-item" href="/editpost?id={{ .Post_Info.ID }}">Modifier le post</a>
                 <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" style="color:red">Supprimer le post</a>
                 <hr class="dropdown-divider"> {{ end }}
                 <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#signalModal">Signaler</a>
@@ -19,7 +22,8 @@
 
         <a style="float:right; text-decoration: none; color: inherit" name="ID" href="/profil?ID={{ .Post_Info.Post_User_Info.ID}}" value="{{ .Post_Info.Post_User_Info.ID}}">{{ .Post_Info.Post_User_Info.UserName }}</a>
         <img src="{{ .Post_Info.Post_User_Info.Image }}" class="mx-1 mt-1" style="float:right;border-radius: 100%;height:25px;width:25px;">
-        <p style="float:right"> <input name="Liker" type="checkbox" id="checkbox" {{ .Currently_Post_Like }} onchange="submit()" />
+        <p style="float:right"> <input name="submitButton" value="Liker" type="checkbox" id="checkbox" {{ .Currently_Post_Like }} onclick="document.getElementById('coucou').submit()" />
+            
             <label for="checkbox">
         
         <svg id="heart-svg" name="Like" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
@@ -64,6 +68,7 @@
           </g>
         </svg>
       </label> {{ .Post_Info.Likes}} | </p>
+
         <h1>{{ .Post_Info.Title }}
             <h6>
                 {{ range $cat := .Post_Info.Categories}}
@@ -86,8 +91,8 @@
     </div>
     <br>
     <div class="container">
-        <input type="text" name="comment" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;" required>
-        <button type="submit" class="btn btn-outline-secondary">
+        <input id='input' onkeyup='javascript:isCharSet()' type="text" name="comment" placeholder="Commentaire.." style="width: 89%;height:40px;border-radius: 10px;" required>
+        <button onclick="submit()" id='button' name="submitButton" value="Commenter" class="btn btn-outline-secondary">
             <i class="fas fa-paper-plane">
             </i>
             Commenter
@@ -166,6 +171,19 @@
     myModal.addEventListener('shown.bs.modal', function() {
         myInput.focus()
     })
+</script>
+
+<script>
+let inputElt = document.getElementById('input');
+let btn = document.getElementById('button');
+btn.disabled = true;
+function isCharSet() {
+  if (inputElt.value != "") {
+    btn.disabled = false;
+  } else {
+    btn.disabled = true;
+  }  
+}
 </script>
 
 <script src="../assets/main.js"></script>

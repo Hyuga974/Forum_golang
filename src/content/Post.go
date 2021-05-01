@@ -50,6 +50,9 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 
 	db.Close()
 
+	
+	fmt.Println("Submit avec  : ",r.FormValue("submitButton"))
+
 	//Récupération du nouveau commentaire
 	if r.Method == "POST" {
 		db, _ := sql.Open("sqlite3", "database/database.db")
