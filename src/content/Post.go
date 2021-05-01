@@ -51,7 +51,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	db.Close()
 
 	
-	fmt.Println("Submit avec  : ",r.FormValue("submitButton"))
+	fmt.Println("Submit avec  : ",r.FormValue("commentDeleteButton"))
 
 	//Récupération du nouveau commentaire
 	if r.Method == "POST" {
@@ -140,6 +140,10 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 
 					likeNow = ""
 				}
+			}else if r.FormValue("commentDeleteButton") !=""{
+				fmt.Println("Suppression du commentaire id: ", r.FormValue("commentDeleteButton") )
+				com_id := r.FormValue("commentDeleteButton")
+				DeleteCommentaire(com_id, post_id, userInfo)
 			}
 		} else {
 			http.Redirect(w, r, "/login", 301)

@@ -209,7 +209,7 @@ func DeletePost(id string, user INFO) {
 			Comment_Nb: comments_nb,
 		}
 
-		if user.ID == post_info.User_ID || user.Admin {
+		if user.ID == post_info.User_ID || user.Admin || user.Modo{
 
 			del, _ := db.Prepare("DELETE from Posts WHERE id=?")
 
@@ -244,6 +244,52 @@ func DeletePost(id string, user INFO) {
 			CheckErr(err)
 
 			Like.Close()
+		}
+		db.Close()
+	}
+}
+
+func DeleteCommentaire(id string,post_id string,  user INFO) {
+
+	
+	if user.UserName != "" {
+		// postID := post_id
+		// var body string
+
+		db, err := sql.Open("sqlite3", "database/database.db")
+		CheckErr(err)
+		// post, err := db.Query("SELECT * FROM Comments WHERE id=" + id)
+		// if err != nil {
+		// 	fmt.Println(err.Error())
+		// }
+
+		// CheckErr(err)
+		// for post.Next() {
+		// 	err = post.Scan(&id,&body, &user_id,&post_id, &since)
+		// 	CheckErr(err)
+		// }
+		// post.Close()
+
+		// comment := COMMENT{
+		// 	ID:         id,
+		// 	User_ID:    user_id,
+		// 	User_Info: user,
+		// 	Post_ID: post_id,
+		// 	Body:       body,
+		// }
+
+		if /*user.ID == post_info.User_ID ||*/ user.Admin || user.Modo{
+
+			del, _ := db.Prepare("DELETE from Comments WHERE id=?")
+
+			res, err := del.Exec(id)
+			CheckErr(err)
+
+			_, err = res.RowsAffected()
+			CheckErr(err)
+
+			del.Close()
+
 		}
 		db.Close()
 	}
