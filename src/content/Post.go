@@ -58,8 +58,14 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		db, _ := sql.Open("sqlite3", "database/database.db")
 		comment := r.FormValue("comment")
 
-		if userInfo.UserName != "" {
-			if comment != "" {
+		changement := false
+		if (dejaLike && r.FormValue("Liker")=="Liker") || (!dejaLike && r.FormValue("Liker") == "") {
+			changement=false
+		}else{
+			changement=true
+		}
+		if userInfo.UserName != ""{
+			if comment != ""  && !changement {
 				datab, err := db.Prepare("INSERT INTO Comments (body, user_id,post_id,since) VALUES (?,?,?,?)")
 				if err != nil {
 					fmt.Println(err)
@@ -76,67 +82,63 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 					fmt.Println(err)
 				}
 				datab.Close()
-			} else {
-				fmt.Println(r.FormValue("deleteButton"))
-				if r.FormValue("deleteButton") != "" {
+			} else if r.FormValue("deleteButton") != "" {
+				DeletePost(post_id, userInfo)
+				http.Redirect(w,r,"/posts", 301)
+			} else if changement{
+				if !dejaLike {
 
-					DeletePost(post_id, userInfo)
-					http.Redirect(w,r,"/posts", 301)
-				} else {
-					if !dejaLike {
-
-						loc, _ := time.LoadLocation("Europe/Paris")
-						pretime := time.Now().In(loc)
-						since := pretime.String()[:19]
-						datab, err := db.Prepare("INSERT INTO Likes (user_id,post_id,since) VALUES (?,?,?)")
-						if err != nil {
-							fmt.Println(err)
-							http.Error(w, "Server Error", 500)
-						}
-						user_id := userInfo.ID
-						post_id := upost_id
-						_, err = datab.Exec(user_id, post_id, since)
-						if err != nil {
-							fmt.Println(err)
-						}
-						datab.Close()
-
-						dataPost, err := db.Query("SELECT * FROM Posts WHERE id=" + strconv.Itoa(post_id))
-						if err != nil {
-							fmt.Println(err.Error())
-						}
-						likes = 0
-						var title string
-						var categories string
-						var body string
-						var image string
-						var comments_nb int
-						for dataPost.Next() {
-							err = dataPost.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb, &since)
-							CheckErr(err)
-						}
-						dataPost.Close()
-
-						likeNow = "checked"
-
-					} else {
-						fmt.Printf("Post id : %s", post_id)
-						upost_id, err := strconv.Atoi(post_id)
-						CheckErr(err)
-						fmt.Printf("User id : %d", userInfo.ID)
-						stmt, err := db.Prepare("delete from Likes where user_id=? AND post_id=?")
-						CheckErr(err)
-
-						res, err := stmt.Exec(userInfo.ID, upost_id)
-						CheckErr(err)
-
-						_, err = res.RowsAffected()
-						CheckErr(err)
-
-						stmt.Close()
-
-						likeNow = ""
+					loc, _ := time.LoadLocation("Europe/Paris")
+					pretime := time.Now().In(loc)
+					since := pretime.String()[:19]
+					datab, err := db.Prepare("INSERT INTO Likes (user_id,post_id,since) VALUES (?,?,?)")
+					if err != nil {
+						fmt.Println(err)
+						http.Error(w, "Server Error", 500)
 					}
+					user_id := userInfo.ID
+					post_id := upost_id
+					_, err = datab.Exec(user_id, post_id, since)
+					if err != nil {
+						fmt.Println(err)
+					}
+					datab.Close()
+
+					dataPost, err := db.Query("SELECT * FROM Posts WHERE id=" + strconv.Itoa(post_id))
+					if err != nil {
+						fmt.Println(err.Error())
+					}
+					likes = 0
+					var title string
+					var categories string
+					var body string
+					var image string
+					var comments_nb int
+					for dataPost.Next() {
+						err = dataPost.Scan(&post_id, &title, &categories, &body, &user_id, &image, &likes, &comments_nb, &since)
+						CheckErr(err)
+					}
+					dataPost.Close()
+
+					likeNow = "checked"
+
+				} else {
+					fmt.Printf("Post id : %s", post_id)
+					upost_id, err := strconv.Atoi(post_id)
+					CheckErr(err)
+					fmt.Printf("User id : %d", userInfo.ID)
+					stmt, err := db.Prepare("delete from Likes where user_id=? AND post_id=?")
+					CheckErr(err)
+
+					res, err := stmt.Exec(userInfo.ID, upost_id)
+					CheckErr(err)
+
+					_, err = res.RowsAffected()
+					CheckErr(err)
+
+					stmt.Close()
+
+					likeNow = ""
 				}
 			}
 		} else {
