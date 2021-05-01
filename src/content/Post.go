@@ -173,16 +173,9 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		err = getComment.Scan(&comment_id, &bodyComment, &user_id, &id_Post, &since)
 		CheckErr(err)
 		if upost_id == id_Post {
-			oneComment := COMMENT{
-				ID:      comment_id,
-				User_ID: user_id,
-				Post_ID: id_Post,
-				Body:    bodyComment,
-			}
-
 			user_comment := GetUser(user_id)
 
-			oneComment = COMMENT{
+			oneComment := COMMENT{
 				ID:        comment_id,
 				User_ID:   user_id,
 				User_Info: user_comment,
@@ -271,6 +264,7 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		Post_Info:           post_info,
 		Currently_Post_Like: likeNow,
 	}
+	fmt.Println(data.Self_User_Info.Admin)
 	defer db.Close()
 
 	var files []string
