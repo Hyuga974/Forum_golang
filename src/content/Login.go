@@ -57,15 +57,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			mdp := r.FormValue("password")
-			fmt.Printf("mdp entré : %s", mdp)
 
 			test.Close()
-			fmt.Printf("Before: mailfound --> %v \n", mailfound)
 			mod = IntToBoolAdmin(modB)
 			if mailfound {
 				fmt.Print("Into mailfound")
 				cryptedPassword := []byte(Password)
-				fmt.Println(bcrypt.CompareHashAndPassword(cryptedPassword, []byte(mdp)))
 				if bcrypt.CompareHashAndPassword(cryptedPassword, []byte(mdp)) == nil {
 					CookieCreation(w, id)
 					userinfo = INFO{

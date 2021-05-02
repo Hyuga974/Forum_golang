@@ -16,6 +16,7 @@ func EditPost(w http.ResponseWriter, r *http.Request) {
 
 	postID := r.FormValue("id")
 	if user.UserName != "" {
+		var data ALLINFO
 		var post_id int
 		var title string
 		var categories string
@@ -153,6 +154,19 @@ func EditPost(w http.ResponseWriter, r *http.Request) {
 			}
 
 			files := []string{"template/EditPost.html", "template/Common.html"}
+			tmp, err := template.ParseFiles(files...)
+			if err != nil {
+				fmt.Println(err)
+				http.Error(w, "Server Error: Check template", 500)
+			}
+
+			err = tmp.Execute(w, data)
+			if err != nil {
+				fmt.Println(err)
+				http.Error(w, "Server Error", 500)
+			}
+		}else{
+			files := []string{"template/404.html"}
 			tmp, err := template.ParseFiles(files...)
 			if err != nil {
 				fmt.Println(err)

@@ -64,7 +64,6 @@ func GetSession(r *http.Request) INFO {
 }
 
 func GetUser(id int) INFO {
-	fmt.Println("Récupération des info du user ", strconv.Itoa(id))
 	db, err := sql.Open("sqlite3", "database/database.db")
 	if err != nil {
 		fmt.Print(err)

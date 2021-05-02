@@ -338,9 +338,6 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "POST" {
-		fmt.Println(r.FormValue("takeOut"))
-		fmt.Println(r.FormValue("take"))
-		fmt.Println(r.FormValue("delete"))
 		if r.FormValue("takeOut")== "retrograde"{
 			DemoteUser(userID, user)
 			path:="/profil?ID=" + userID
@@ -384,9 +381,9 @@ func Profil(w http.ResponseWriter, r *http.Request) {
 				new_Image = old_Image
 			} else {
 				defer file.Close()
-				fmt.Printf("Uploaded File: %+v\n", strings.ReplaceAll(handler.Filename, " ", "-"))
-				fmt.Printf("File Size: %+v\n", handler.Size)
-				fmt.Printf("MIME Header: %+v\n", handler.Header)
+				// fmt.Printf("Uploaded File: %+v\n", strings.ReplaceAll(handler.Filename, " ", "-"))
+				// fmt.Printf("File Size: %+v\n", handler.Size)
+				// fmt.Printf("MIME Header: %+v\n", handler.Header)
 
 				/*
 					buff := make([]byte, 512)

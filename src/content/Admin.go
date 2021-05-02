@@ -202,8 +202,6 @@ func AdminUser(w http.ResponseWriter, r *http.Request) {
 
 func DeleteUser(userid string, user INFO) {
 
-	fmt.Println("1")
-
 	if user.UserName != "" {
 		var username string
 		var email string
@@ -214,14 +212,13 @@ func DeleteUser(userid string, user INFO) {
 		var country string
 		var mod int
 
-		fmt.Println("2")
 		db, err := sql.Open("sqlite3", "database/database.db")
 		CheckErr(err)
 		row, err := db.Query("SELECT * FROM Users WHERE id=" + userid)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-fmt.Println("3")
+		
 		CheckErr(err)
 		for row.Next() {
 			err = row.Scan(&userid, &username, &email, &since, &description, &password, &image, &country, &mod)
@@ -232,7 +229,7 @@ fmt.Println("3")
 		userTarget := GetUser(userIDInt)
 
 		if (user.Admin || user.Modo) && !userTarget.Admin {
-			fmt.Println("4")
+
 			del, _ := db.Prepare("DELETE from Users WHERE id=?")
 
 			res, err := del.Exec(userid)
@@ -242,8 +239,6 @@ fmt.Println("3")
 			CheckErr(err)
 
 			del.Close()
-
-			fmt.Println("5")
 			post, err := db.Prepare("DELETE from Posts WHERE user_id=?")
 
 			CheckErr(err)
@@ -255,8 +250,6 @@ fmt.Println("3")
 			CheckErr(err)
 
 			post.Close()
-			
-			fmt.Println("7")
 
 		}
 		db.Close()
@@ -265,7 +258,6 @@ fmt.Println("3")
 
 func PromoteUser(id string, user INFO) {
 
-	fmt.Println("Promotion en cours!!!")
 	if user.UserName != "" {
 		var username string
 		var email string
@@ -308,7 +300,6 @@ func PromoteUser(id string, user INFO) {
 
 func DemoteUser(id string, user INFO) {
 
-	fmt.Println("Relegation en cours!!!")
 	if user.UserName != "" {
 		var username string
 		var email string

@@ -42,10 +42,10 @@ func CreationPost(w http.ResponseWriter, r *http.Request) {
 				image = r.FormValue("myFile")
 				fmt.Println(err)
 			} else {
-				defer file.Close()
-				fmt.Printf("Uploaded File: %+v\n", strings.ReplaceAll(handler.Filename, " ", "-"))
-				fmt.Printf("File Size: %+v\n", handler.Size)
-				fmt.Printf("MIME Header: %+v\n", handler.Header)
+				// defer file.Close()
+				// fmt.Printf("Uploaded File: %+v\n", strings.ReplaceAll(handler.Filename, " ", "-"))
+				// fmt.Printf("File Size: %+v\n", handler.Size)
+				// fmt.Printf("MIME Header: %+v\n", handler.Header)
 
 				absPath, _ := filepath.Abs("../src/assets/posts/" + strings.ReplaceAll(handler.Filename, " ", "-"))
 

@@ -51,7 +51,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 	db.Close()
 
 	
-	fmt.Println("Submit avec  : ",r.FormValue("commentDeleteButton"))
 
 	//Récupération du nouveau commentaire
 	if r.Method == "POST" {
@@ -123,10 +122,8 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 					likeNow = "checked"
 
 				} else {
-					fmt.Printf("Post id : %s", post_id)
 					upost_id, err := strconv.Atoi(post_id)
 					CheckErr(err)
-					fmt.Printf("User id : %d", userInfo.ID)
 					stmt, err := db.Prepare("delete from Likes where user_id=? AND post_id=?")
 					CheckErr(err)
 
@@ -141,7 +138,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 					likeNow = ""
 				}
 			}else if r.FormValue("commentDeleteButton") !=""{
-				fmt.Println("Suppression du commentaire id: ", r.FormValue("commentDeleteButton") )
 				com_id := r.FormValue("commentDeleteButton")
 				DeleteCommentaire(com_id, post_id, userInfo)
 			}
@@ -195,7 +191,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		err = dataLikes.Scan(&id, &upost_id, &user_id, &since)
 		CheckErr(err)
 		likes++
-		fmt.Printf("nb likes pendant la boucle: %d", likes)
 	}
 	dataLikes.Close()
 
@@ -210,7 +205,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		err = dataComment.Scan(&id, &body, &user_id, &upost_id, &since)
 		CheckErr(err)
 		commentnb++
-		fmt.Printf("nb commentaires pendant la boucle: %d", commentnb)
 	}
 	dataComment.Close()
 
@@ -264,7 +258,6 @@ func OnePost(w http.ResponseWriter, r *http.Request) {
 		Post_Info:           post_info,
 		Currently_Post_Like: likeNow,
 	}
-	fmt.Println(data.Self_User_Info.Admin)
 	defer db.Close()
 
 	var files []string

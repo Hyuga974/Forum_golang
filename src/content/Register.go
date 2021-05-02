@@ -53,8 +53,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 					fmt.Println(err.Error())
 					}
 				}
-				
-				fmt.Println("Normalement vers Login")
 				http.Redirect(w, r, "/login", 301)
 			}
 		}

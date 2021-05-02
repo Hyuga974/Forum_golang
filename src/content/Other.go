@@ -50,7 +50,6 @@ func RandomColor() map[string]string {
 
 
 func SearchData(search string) ALLINFO{
-	fmt.Println("Search En cours")
 	db, err := sql.Open("sqlite3", "database/database.db")
 	CheckErr(err)
 
