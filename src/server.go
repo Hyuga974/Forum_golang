@@ -24,7 +24,7 @@ func main() {
 	http.HandleFunc("/profil", content.Profil)
 	http.HandleFunc("/login", content.Login)
 	http.HandleFunc("/register", content.Register)
-	fmt.Println("Start... ")
+	fmt.Println("Starting local server for the website on : localhost:4444 ")
 	http.ListenAndServe(":4444", nil)
 
 }

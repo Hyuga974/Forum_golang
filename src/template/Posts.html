@@ -22,7 +22,7 @@
             </div>
             <div class="col-sm-6"></div>
             <div class="input-group">
-                <input style="max-height: 100%;" type="text" class="form-control" placeholder="SearchBar" name="search"  aria-label="SearchBar" aria-describedby="button-addon2">
+                <input style="max-height: 100%;" type="text" class="form-control" placeholder="SearchBar" name="search" aria-label="SearchBar" aria-describedby="button-addon2">
                 <button style="height: 100%;" class="btn btn-outline-success" type="submit" id="button-addon2" onclick="submit()"><i class="fas fa-search"></i> Search</button>
             </div>
             <div class="col-sm-3">
@@ -39,7 +39,7 @@
                             <div class="card-body" style="padding-bottom:1%;padding-right: 1%;">
                                 <h5 class="card-title">{{$post.Title}}</h5>
                                 {{ range $categories := $post.Categories }}
-                                    <i type="submit" name="{{ $categories.Cat }}" value="{{ $categories.Cat }}" class="badge rounded-pill" style="background-color:{{ $categories.Color }};">{{ $categories.Cat }}</i> {{ end }}
+                                <i type="submit" name="{{ $categories.Cat }}" value="{{ $categories.Cat }}" class="badge rounded-pill" style="background-color:{{ $categories.Color }};">{{ $categories.Cat }}</i> {{ end }}
                                 <p class="card-text text-truncate">{{ $post.Body }}</p>
                                 <div style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ $post.Comment_Nb}} - ❤️ {{ $post.Likes}} - <img src="{{ $post.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </div>
                             </div>
@@ -51,9 +51,10 @@
         </div>
     </div>
 </form>
+<div style="margin-bottom: 100px;"><span></span></div>
 <!--<div class="input-group ">
     <input type="file " class="form-control " id="inputGroupFile04 " aria-describedby="inputGroupFileAddon04 " aria-label="Upload ">
     <button class="btn btn-outline-secondary " type="button " id="inputGroupFileAddon04 ">Button</button>
     </div>
 
-    C'est pour importer un fichier (photo de profil ou post avec photo)--> {{end}}
+    C'est pour importer un fichier (photo de profil ou post avec photo)-->{{end}}

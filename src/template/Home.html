@@ -31,10 +31,10 @@
 </div>
 
 <div class="container mt-5">
-    
-<h4 style="@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&display=swap'); font-family: Comfortaa; "><b>Les Posts les plus recents :</b></h4>
+
+    <h4 class="recent-p"><b>Les Posts les plus recents :</b></h4>
     <div class="row g-2 mt-2">
-    {{ range $recentPost := .Post_Most_Recent }}
+        {{ range $recentPost := .Post_Most_Recent }}
         <div class="col" style="max-width: 430px;">
             <div class="bg-light">
                 <a href="/post?id={{ $recentPost.ID }}" class="custom-card">
@@ -42,10 +42,9 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ $recentPost.Title }}</h5>
                             <span style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ $recentPost.Comment_Nb}} - ❤️ {{ $recentPost.Likes}} -  <img src="{{ $recentPost.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </span>
-                            <div> 
+                            <div>
                                 {{ range $cat := $recentPost.Categories}}
-                                <span class="badge rounded-pill" style="background-color:{{ $cat.Color }};">{{ $cat.Cat }}</span>
-                                {{ end }}
+                                <span class="badge rounded-pill" style="background-color:{{ $cat.Color }};">{{ $cat.Cat }}</span> {{ end }}
                             </div>
                             <p class="card-text text-truncate">{{ $recentPost.Body}}</p>
                         </div>
@@ -55,9 +54,9 @@
         </div>
         {{ end }}
     </div>
-<h4 style="@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&display=swap'); font-family: Comfortaa; " class="mt-4"><b>Les Posts les plus aimés :</b></h4>
+    <h4 class="mt-4 recent-p"><b>Les Posts les plus aimés :</b></h4>
     <div class="row g-2 mt-2">
-    {{ range $likePost := .Post_Most_Likes }}
+        {{ range $likePost := .Post_Most_Likes }}
         <div class="col" style="max-width: 33%;">
             <div class="bg-light">
                 <a href="/post?id={{ $likePost.ID }}" class="custom-card">
@@ -65,10 +64,9 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ $likePost.Title }}</h5>
                             <span style="font-size:10px;float:right;"><i class="far fa-comment-dots"></i> {{ $likePost.Comment_Nb}} - ❤️ {{ $likePost.Likes}} -  <img src="{{ $likePost.Post_User_Info.Image }}" style="float:right;border-radius: 100%;height:15px;width:15px; margin-left: 5px;"> </span>
-                            <div> 
+                            <div>
                                 {{ range $cat := $likePost.Categories}}
-                                <span class="badge rounded-pill" style="background-color:{{ $cat.Color }};">{{ $cat.Cat }}</span>
-                                {{ end }}
+                                <span class="badge rounded-pill" style="background-color:{{ $cat.Color }};">{{ $cat.Cat }}</span> {{ end }}
                             </div>
                             <p class="card-text text-truncate">{{ $likePost.Body}}</p>
                         </div>
